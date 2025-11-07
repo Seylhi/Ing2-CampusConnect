@@ -1,0 +1,6 @@
+esiag/back/SpringConfiguration.class
+esiag/back/EsiagBackApplication.class
+esiag/back/services/sample/SampleService.class
+esiag/back/repositories/sample/SampleRepository.class
+esiag/back/models/sample/Sample.class
+esiag/back/models/sample/SampleType.class

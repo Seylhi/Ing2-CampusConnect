@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.projectlombok:lombok:edge-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/projectlombok/lombok/edge-SNAPSHOT/lombok-edge-20230920.025101-1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/projectlombok/lombok/edge-SNAPSHOT/lombok-edge-20230920.025101-1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/projectlombok/lombok/edge-SNAPSHOT/lombok-edge-20230920.025101-1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
