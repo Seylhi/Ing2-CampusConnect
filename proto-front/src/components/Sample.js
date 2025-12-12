@@ -62,7 +62,7 @@ export default function Sample() {
     return <div className="container text-center">No samples</div>;
   return (
     <div className="container text-center">
-      <h4 className=" mx-2">Sample List</h4>
+      <h4 className=" mx-2">List</h4>
       <div className="row">
         <table className="table table-sm table-bordered table-hover">
           <thead>
