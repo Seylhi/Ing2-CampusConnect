@@ -38,6 +38,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.28.5",
     "react-router-dom": "^6.16.0"
   }
 }
