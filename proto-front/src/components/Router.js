@@ -2,6 +2,7 @@ import React from 'react';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import App from "./App";
 import Sample from "./Sample";
+import Salle from "./Salle";
 import Navbar from "./Navbar";
 import NotFound from "./NotFound";
 
@@ -13,6 +14,7 @@ export default function Router () {
                 <Routes>
                     <Route path="/" element={<App />}/>
                     <Route path="/sample" element={<Sample />}/>
+                    <Route path="/salle" element={<Salle />}/>
                     <Route path="*" element={<NotFound />}/>
                 </Routes>
             </div>

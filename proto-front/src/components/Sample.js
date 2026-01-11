@@ -21,7 +21,6 @@ export default function Sample() {
   };
   const confirmRemoveSample = (id) => {
     if (window.confirm("Are you sure?")) {
-      // Delete it!
       removeSample(id);
     }
   };
