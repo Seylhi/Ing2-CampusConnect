@@ -15,11 +15,13 @@ US4 - Lier le calcul énergétique à la base de donnée PSQL
 US5 - Afficher le score énergétique calculé
 
 
+REDJECHTA Abderraouf -
+US1 - Définir structure de la carte
+US2 - Implémenter navigation carte
+US3 - Gérer changement d’étage
+US4 - Récupérer et afficher les informations d’une salle
+US5 - Rechercher une salle
+US6 - Filtrer les salles
+
+
 Application multifonctionnelle - Campus universitaire. (Gestion des salles, capteurs, offres de stages et emplois, cartes graphiques)
-test webhook 1
-test webhook2
-test webhook 3 ( raouf )
-test webhook 4
-test webhook 5
-test webhook 6
-test webhook 7
