@@ -8,9 +8,14 @@ pipeline {
         JAR_NAME = "Back-1.0-SNAPSHOT.jar"
     }
 
+    options {
+        timestamps()
+        ansiColor('xterm')
+    }
+
     stages {
 
-        /*stage('Checkout') {
+        stage('Checkout') {
             steps {
                 checkout scm
             }
@@ -35,28 +40,19 @@ pipeline {
 
         stage('Deploy Backend') {
             steps {
-                sshagent(credentials: ['vm-ssh-key']) {
+                sshagent(credentials: ['back-ssh-key']) {
                     sh """
                     ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_HOST} '
                         pkill -f ${JAR_NAME} || true
                         rm -f ${APP_DIR}/${JAR_NAME}
                     '
                     scp Back/target/${JAR_NAME} ${VM_USER}@${VM_HOST}:${APP_DIR}/${JAR_NAME}
-
                     ssh ${VM_USER}@${VM_HOST} '
                         nohup java -jar ${APP_DIR}/${JAR_NAME} > ${APP_DIR}/app.log 2>&1 &
                     '
                     """
                 }
             }
-        }*/
-
-        stage('Test SSH') {
-         steps {
-        sshagent(credentials: ['back-ssh-key']) {
-            sh 'ssh -o StrictHostKeyChecking=no back@172.31.253.207 "echo SSH OK"'
         }
-    }
-}
     }
 }
