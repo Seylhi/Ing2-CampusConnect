@@ -34,32 +34,28 @@ pipeline {
         }
 
         stage('Deploy Backend') {
-    steps {
-        sshagent(credentials: ['back-ssh-key']) {
+            steps {
+                sshagent(credentials: ['back-ssh-key']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_HOST} '
+                        pkill -f ${JAR_NAME} || true
+                        rm -f ${APP_DIR}/${JAR_NAME}
+                    '
+                    """
 
-            sh """
-                ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_HOST} '
-                    pkill -f ${JAR_NAME} || true
-                    rm -f ${APP_DIR}/${JAR_NAME}
-                '
-            """
+                    sh """
+                    scp Back/target/${JAR_NAME} ${VM_USER}@${VM_HOST}:${APP_DIR}/${JAR_NAME}
+                    """
 
-            sh """
-                scp Back/target/${JAR_NAME} ${VM_USER}@${VM_HOST}:${APP_DIR}/${JAR_NAME}
-            """
-
-            sh """
-                ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_HOST} '
-                    nohup java -jar ${APP_DIR}/${JAR_NAME} > ${APP_DIR}/app.log 2>&1 &
-                '
-            """
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_HOST} '
+                        nohup java -jar ${APP_DIR}/${JAR_NAME} > ${APP_DIR}/app.log 2>&1 &
+                    '
+                    """
+                }
+            }
         }
     }
 }
 
-    }
-}
-
-    }
-}
     
