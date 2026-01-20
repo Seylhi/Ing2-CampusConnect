@@ -1,8 +1,16 @@
 pipeline {
     agent any
 
+    environment {
+        VM_USER = "back"
+        VM_HOST = "172.31.253.207"
+        APP_DIR = "/home/back/DeployBack"
+        JAR_NAME = "Back-1.0-SNAPSHOT.jar"
+    }
+
     stages {
-        stage('Checkout') {
+
+        /*stage('Checkout') {
             steps {
                 checkout scm
             }
@@ -10,19 +18,45 @@ pipeline {
 
         stage('Backend Build') {
             steps {
-                dir('proto-back') {
-                    sh 'mvn clean package -DskipTests'
+                dir('Back') {
+                    sh 'mvn clean package spring-boot:repackage -DskipTests'
                 }
             }
         }
 
         stage('Frontend Build') {
             steps {
-                dir('proto-front') {
+                dir('Front') {
                     sh 'npm install'
                     sh 'npm run build'
                 }
             }
         }
+
+        stage('Deploy Backend') {
+            steps {
+                sshagent(credentials: ['vm-ssh-key']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_HOST} '
+                        pkill -f ${JAR_NAME} || true
+                        rm -f ${APP_DIR}/${JAR_NAME}
+                    '
+                    scp Back/target/${JAR_NAME} ${VM_USER}@${VM_HOST}:${APP_DIR}/${JAR_NAME}
+
+                    ssh ${VM_USER}@${VM_HOST} '
+                        nohup java -jar ${APP_DIR}/${JAR_NAME} > ${APP_DIR}/app.log 2>&1 &
+                    '
+                    """
+                }
+            }
+        }*/
+
+        stage('Test SSH') {
+         steps {
+        sshagent(credentials: ['vm-ssh-key']) {
+            sh 'ssh -o StrictHostKeyChecking=no back@172.31.253.207 "echo SSH OK"'
+        }
+    }
+}
     }
 }
