@@ -20,6 +20,11 @@ export default function Navbar() {
         </Link>
       </li>
       <li className="nav-item">
+        <Link className="nav-link" to="/capteur">
+          Capteur
+        </Link>
+      </li>
+      <li className="nav-item">
         <Link className="nav-link" to="/map">
           Map
         </Link>
