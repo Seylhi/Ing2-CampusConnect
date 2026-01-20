@@ -36,26 +36,30 @@ pipeline {
         stage('Deploy Backend') {
             steps {
                 sshagent(credentials: ['back-ssh-key']) {
+                    // 1. Kill + clean
                     sh """
-                    ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_HOST} '
-                        pkill -f ${JAR_NAME} || true
-                        rm -f ${APP_DIR}/${JAR_NAME}
-                    '
+                        ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_HOST} '
+                            pkill -f ${JAR_NAME} || true
+                            rm -f ${APP_DIR}/${JAR_NAME}
+                        '
                     """
 
+                    // 2. Copie du JAR (scp visible dans Jenkins logs)
                     sh """
-                    scp Back/target/${JAR_NAME} ${VM_USER}@${VM_HOST}:${APP_DIR}/${JAR_NAME}
+                        scp -o StrictHostKeyChecking=no Back/target/${JAR_NAME} ${VM_USER}@${VM_HOST}:${APP_DIR}/${JAR_NAME}
                     """
 
+                    // 3. Démarrage de l'app
                     sh """
-                    ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_HOST} '
-                        nohup java -jar ${APP_DIR}/${JAR_NAME} > ${APP_DIR}/app.log 2>&1 &
-                    '
+                        ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_HOST} '
+                            nohup java -jar ${APP_DIR}/${JAR_NAME} > ${APP_DIR}/app.log 2>&1 &
+                        '
                     """
                 }
             }
-        }
+        }   
     }
 }
+
 
     
