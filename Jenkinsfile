@@ -53,7 +53,7 @@ pipeline {
 
         stage('Test SSH') {
          steps {
-        sshagent(credentials: ['vm-ssh-key']) {
+        sshagent(credentials: ['back-ssh-key']) {
             sh 'ssh -o StrictHostKeyChecking=no back@172.31.253.207 "echo SSH OK"'
         }
     }
