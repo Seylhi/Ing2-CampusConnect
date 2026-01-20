@@ -8,11 +8,6 @@ pipeline {
         JAR_NAME = "Back-1.0-SNAPSHOT.jar"
     }
 
-    options {
-        timestamps()
-        ansiColor('xterm')
-    }
-
     stages {
 
         stage('Checkout') {
