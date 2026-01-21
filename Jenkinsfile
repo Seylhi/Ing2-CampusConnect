@@ -2,47 +2,47 @@ pipeline {
     agent any
 
     environment {
-        VM_USER = 'back'
-        VM_HOST = '172.31.253.207'
-        JAR_NAME = 'Back-1.0-SNAPSHOT.jar'
-        APP_DIR = '/home/back/DeployBack'
+        VM_USER = "back"
+        VM_HOST = "172.31.253.207"
+        BACKEND_DIR = "Back"
+        FRONTEND_DIR = "Front"
+        JAR_NAME = "Back-1.0-SNAPSHOT.jar"
+        REMOTE_DEPLOY_PATH = "/home/back/DeployBack"
     }
 
     stages {
-
-        stage('Build backend') {
+        stage('Build Backend') {
             steps {
-                dir('Back') {
+                dir("${BACKEND_DIR}") {
                     sh 'mvn clean package -DskipTests'
                 }
             }
         }
 
-        stage('Build frontend') {
+        stage('Build Frontend') {
             steps {
-                dir('Front') {
+                dir("${FRONTEND_DIR}") {
                     sh 'npm install'
                     sh 'CI=false npm run build'
                 }
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy to VM') {
             steps {
                 sshagent(credentials: ['back-ssh-key']) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_HOST} '
-                            pkill -f ${JAR_NAME} || true
-                            rm -f ${APP_DIR}/${JAR_NAME}
-                        '
-                        scp Back/target/${JAR_NAME} ${VM_USER}@${VM_HOST}:${APP_DIR}/${JAR_NAME}
-                        ssh ${VM_USER}@${VM_HOST} '
-                            nohup java -jar ${APP_DIR}/${JAR_NAME} > ${APP_DIR}/app.log 2>&1 &
-                        '
+                    ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_HOST} '
+                        pkill -f ${JAR_NAME} || true
+                        rm -f ${REMOTE_DEPLOY_PATH}/${JAR_NAME}
+                    '
+                    scp ${BACKEND_DIR}/target/${JAR_NAME} ${VM_USER}@${VM_HOST}:${REMOTE_DEPLOY_PATH}/
+                    ssh ${VM_USER}@${VM_HOST} '
+                        nohup java -jar ${REMOTE_DEPLOY_PATH}/${JAR_NAME} > ${REMOTE_DEPLOY_PATH}/app.log 2>&1 &
+                    '
                     """
                 }
             }
         }
     }
-    
 }
