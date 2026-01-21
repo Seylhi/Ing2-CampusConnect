@@ -51,10 +51,10 @@ pipeline {
 
                 sshagent(credentials: ['front-ssh-key']) {
                     sh """
-                    ssh ${FRONT_USER}@${FRONT_HOST} "mkdir -p ${FRONT_DEPLOY_DIR}/frontend"
+                    ssh -o StrictHostKeyChecking=no ${FRONT_USER}@${FRONT_HOST} mkdir -p ${FRONT_DEPLOY_DIR}/frontend
                     """
                     sh """
-                    scp -r Front/build/* ${FRONT_USER}@${FRONT_HOST}:${FRONT_DEPLOY_DIR}/frontend/
+                    scp -o StrictHostKeyChecking=no -r Front/build/* ${FRONT_USER}@${FRONT_HOST}:${FRONT_DEPLOY_DIR}/frontend/
                     """
                 }
             }
