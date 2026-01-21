@@ -14,7 +14,7 @@ public class Capteur {
     private Long id;
 
     @Column(name = "id_salle", nullable = false)
-    private Integer idSalle;
+    private Long idSalle;
 
     private Double temperature;
     private Double humidite;
