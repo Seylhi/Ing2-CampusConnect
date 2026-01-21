@@ -32,30 +32,31 @@ pipeline {
             steps {
                 sshagent(credentials: ['back-ssh-key']) {
 
-                    // 1. Affiche le .jar local pour confirmer qu’il existe
                     sh "ls -lh ${LOCAL_JAR}"
 
-                    // 2. Kill + Supprimer le .jar distant
                     sh '''
-                         echo ">>> Kill & clean remote app"
-                        ssh -o StrictHostKeyChecking=no back@172.31.253.207 "
-                        pkill -f Back-1.0-SNAPSHOT.jar || true
-                        rm -f /home/back/DeployBack/Back-1.0-SNAPSHOT.jar
-                    "
-                    '''
+echo ">>> Kill & clean remote app"
+ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_HOST} << 'EOF'
+pkill -f Back-1.0-SNAPSHOT.jar || true
+rm -f /home/back/DeployBack/Back-1.0-SNAPSHOT.jar
+mkdir -p /home/back/DeployBack
+EOF
+'''
 
-                    // 3. Copier le nouveau .jar
                     sh """
-                        echo ">>> SCP jar to remote VM"
-                        scp -o StrictHostKeyChecking=no ${LOCAL_JAR} ${VM_USER}@${VM_HOST}:${REMOTE_DIR}/
-                    """
+echo ">>> SCP jar to remote VM"
+scp -o StrictHostKeyChecking=no ${LOCAL_JAR} ${VM_USER}@${VM_HOST}:${REMOTE_DIR}/
+"""
 
-                    // 4. Relancer l'app
                     sh """
-                        echo ">>> Start remote app"
-                        ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_HOST} \
-                        'nohup java -jar ${REMOTE_DIR}/${JAR_NAME} > ${REMOTE_DIR}/app.log 2>&1 &'
-                    """
+echo ">>> Start remote app"
+ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_HOST} << 'EOF'
+nohup java -jar /home/back/DeployBack/Back-1.0-SNAPSHOT.jar \
+> /home/back/DeployBack/app.log 2>&1 &
+sleep 2
+pgrep -f Back-1.0-SNAPSHOT.jar
+EOF
+"""
                 }
             }
         }
