@@ -31,7 +31,7 @@ public class CapteurController {
     }
 
     @GetMapping("salle")
-    public ResponseEntity<List<Capteur>> findBySalle(@RequestParam Integer idSalle){
+    public ResponseEntity<List<Capteur>> findBySalle(@RequestParam Long idSalle ){
         return new ResponseEntity<>(capteurService.findBySalle(idSalle), HttpStatus.OK);
     }
 

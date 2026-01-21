@@ -23,7 +23,7 @@ public class CapteurService {
         return capteurRepository.findAll();
     }
 
-    public List<Capteur> findBySalle(Integer idSalle){
+    public List<Capteur> findBySalle(Long idSalle){
     return capteurRepository.findByIdSalleOrderByIdSalleAsc(idSalle);
 }
 
