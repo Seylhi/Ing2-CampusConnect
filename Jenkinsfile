@@ -39,23 +39,27 @@ pipeline {
  
         stage('Deploy to Integration VM') {
             steps {
-                sh """
-                    ssh ${SSH_USER}@${SSH_HOST} '
-                        mkdir -p ${DEPLOY_DIR}/backend
-                    '
-                """
-                sh """
-                    ssh ${FRONT_USER}@${FRONT_HOST} '
-                         mkdir -p ${FRONT_DEPLOY_DIR}/frontend
-                    '
-                """
 
+                sshagent(credentials: ['back-ssh-key']) {
+                    sh """
+                    ssh ${SSH_USER}@${SSH_HOST} "mkdir -p ${DEPLOY_DIR}/backend"
+                    """
+                    sh """
+                    scp Back/target/*.jar ${SSH_USER}@${SSH_HOST}:${DEPLOY_DIR}/backend/
+                    """
+                }
 
-                sh "scp Back/target/*.jar ${SSH_USER}@${SSH_HOST}:${DEPLOY_DIR}/backend/"
-                sh "scp -r Front/build/* ${FRONT_USER}@${FRONT_HOST}:${FRONT_DEPLOY_DIR}/frontend/"
- 
+                sshagent(credentials: ['front-ssh-key']) {
+                    sh """
+                    ssh ${FRONT_USER}@${FRONT_HOST} "mkdir -p ${FRONT_DEPLOY_DIR}/frontend"
+                    """
+                    sh """
+                    scp -r Front/build/* ${FRONT_USER}@${FRONT_HOST}:${FRONT_DEPLOY_DIR}/frontend/
+                    """
+                }
             }
         }
+
     }
  
     post {
