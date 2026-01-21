@@ -36,11 +36,13 @@ pipeline {
                     sh "ls -lh ${LOCAL_JAR}"
 
                     // 2. Kill + Supprimer le .jar distant
-                    sh """
-                        echo ">>> Kill & clean remote app"
-                        ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_HOST} \
-                        'pkill -f ${JAR_NAME} || true && rm -f ${REMOTE_DIR}/${JAR_NAME}'
-                    """
+                    sh '''
+                         echo ">>> Kill & clean remote app"
+                        ssh -o StrictHostKeyChecking=no back@172.31.253.207 "
+                        pkill -f Back-1.0-SNAPSHOT.jar || true
+                        rm -f /home/back/DeployBack/Back-1.0-SNAPSHOT.jar
+                    "
+                    '''
 
                     // 3. Copier le nouveau .jar
                     sh """
