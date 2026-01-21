@@ -5,6 +5,9 @@ pipeline {
         SSH_HOST = '172.31.253.207'
         SSH_USER = 'back'
         DEPLOY_DIR = '/home/back/'
+        FRONT_HOST = '172.31.250.98'
+        FRONT_USER = 'front'
+        FRONT_DEPLOY_DIR = '/home/front/DeployFront'        
     }
  
     stages {
@@ -41,8 +44,15 @@ pipeline {
                         mkdir -p ${DEPLOY_DIR}/backend
                     '
                 """
- 
+                sh """
+                    ssh ${FRONT_USER}@${FRONT_HOST} '
+                         mkdir -p ${FRONT_DEPLOY_DIR}/frontend
+                    '
+                """
+
+
                 sh "scp Back/target/*.jar ${SSH_USER}@${SSH_HOST}:${DEPLOY_DIR}/backend/"
+                sh "scp -r Front/build/* ${FRONT_USER}@${FRONT_HOST}:${FRONT_DEPLOY_DIR}/frontend/"
  
             }
         }
