@@ -29,6 +29,9 @@ export default function Navbar() {
           Map
         </Link>
       </li>
+      <li className="nav-item">
+  <Link className="nav-link" to="/offres">Offres</Link>
+</li>
     </ul>
   );
 }
