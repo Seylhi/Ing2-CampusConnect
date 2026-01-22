@@ -13,3 +13,4 @@ export const GET_CAPTEURS = LOCAL_HOST_CAPTEUR + "all";
 export const UPDATE_CAPTEURS = LOCAL_HOST_CAPTEUR + "update";
 
 export const GET_OFFRES = LOCAL_HOST + "/api/offres/student/";
+export const GET_SALLE_BY_ID = LOCAL_HOST_SALLE;
