@@ -4,7 +4,7 @@ pipeline {
     environment {
         SSH_HOST = '172.31.253.207'
         SSH_USER = 'back'
-        DEPLOY_DIR = '/home/back/'
+        DEPLOY_DIR = '/home/back'
         FRONT_HOST = '172.31.250.98'
         FRONT_USER = 'front'
         FRONT_DEPLOY_DIR = '/home/front/DeployFront'        
