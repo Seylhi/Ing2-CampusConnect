@@ -34,4 +34,15 @@ US7 – Afficher le statut d’une salle dans l’interface utilisateur
 US8 – Visualiser le détail du calcul du score (valeurs réelles, formules, pondérations)
 US9 – Expliquer les critères et seuils utilisés pour le calcul du score dans le front
 
+KHEDIM Mohammed - 
+
+US1 – Récupérer les profils étudiants et les offres d’alternance/stage
+US2 – Filtrer les offres selon la filière et le type de contrat
+US3 – Calculer un score de compatibilité basé sur des critères académiques et de logistique
+US4 – Classer les offres : Offre idéale / Très bonne offre / Offre moyenne
+US5 – Fournir une API REST pour récupérer les offres triées par score pour un étudiant
+US6 – Permettre de changer l'étudiant dans l’interface pour voir ses offres
+US7 – Afficher les offres dans un tableau avec le résultat des scores et la pertinence?
+US8 – Montrer le détail du calcul du score pour chaque offre
+
 Application multifonctionnelle - Campus universitaire. (Gestion des salles, capteurs, offres de stages et emplois, cartes graphiques)
