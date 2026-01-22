@@ -8,11 +8,11 @@
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>esiag.back</groupId>
-  <artifactId>proto-back</artifactId>
+  <artifactId>Back</artifactId>
   <version>1.0-SNAPSHOT</version>
 
 
-  <name>proto-back</name>
+  <name>Back</name>
   <description>Back side of the proto project</description>
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
@@ -56,7 +56,8 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>edge-SNAPSHOT</version>
+      <version>1.18.30</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
