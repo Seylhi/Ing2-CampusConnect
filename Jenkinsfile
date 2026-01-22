@@ -16,7 +16,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('Back') {
-            sh 'mvn clean package -DskipTests'
+            sh 'mvn clean package spring-boot:repackage -DskipTests'
                 }
             }
         }
