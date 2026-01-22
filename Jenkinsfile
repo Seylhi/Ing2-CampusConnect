@@ -60,6 +60,28 @@ pipeline {
             }
         }
 
+        stage('Start Applications') {
+            steps {
+
+                // Start Backend
+                sshagent(credentials: ['back-ssh-key']) {
+                    sh """
+                    echo ">>> Start Backend"
+                    ssh -o StrictHostKeyChecking=no back@${SSH_HOST} "/home/back/start-back.sh"
+                    """
+                }
+
+                // Start Frontend
+                sshagent(credentials: ['front-ssh-key']) {
+                    sh """
+                    echo ">>> Start Frontend"
+                    ssh -o StrictHostKeyChecking=no front@${FRONT_HOST} "/home/front/start-front.sh"
+                    """
+                }
+            }
+}
+
+
     }
  
     post {
