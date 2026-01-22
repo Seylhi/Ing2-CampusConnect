@@ -1,0 +1,20 @@
+.navbar {
+  margin-bottom: 5px;
+  margin-right: 30px;
+  margin-left: 5px;
+}
+
+.navbar-logo {    /* gérer la taille du logo*/
+  height: 60px;
+}
+
+.navbar-links a {
+  margin-left: 20px;
+  text-decoration: none;    /* cela nous permet de camoufler les souligner pour ensuite les faire réapparaître au pointage*/
+  color: #000000;
+  font-weight: 500;
+}
+
+.navbar-links a:hover {   /* quand on survole l'élément, on souligne l'item*/
+  text-decoration: underline;
+}
