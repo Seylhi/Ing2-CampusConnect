@@ -11,6 +11,8 @@ import {
 export default function Capteur() {
   const [capteurs, setCapteurs] = useState([]);
   const [scoreResults, setScoreResults] = useState({}); 
+  const [alertes, setAlertes] = useState([]);
+
 
   // Charger tous les capteurs
   const setCapteurData = async () => {
@@ -67,6 +69,33 @@ export default function Capteur() {
       .then(() => setCapteurData())
       .catch((error) => alert("Error occurred in updateDate: " + error));
   };
+//alerte
+  const loadAlertes = (idCapteur) => {
+  axios
+    .get(`${LOCAL_HOST}/alerte/capteur/${idCapteur}`)
+    .then((res) => {
+      if (res.data.length === 0) {
+        alert("Aucune alerte active pour ce capteur ");
+        return;
+      }
+
+      const message = res.data
+        .map(
+          (a) =>
+            `• [${a.type}] ${a.message}\n  (${new Date(a.dateAlerte).toLocaleString()})`
+        )
+        .join("\n\n");
+
+      alert(
+        `ALERTES ACTIVES (Capteur ${idCapteur})\n\n${message}`
+      );
+    })
+    .catch((err) => {
+      alert("Erreur lors du chargement des alertes");
+      console.error(err);
+    });
+};
+
 
   useEffect(() => {
     setCapteurData();
@@ -186,6 +215,18 @@ export default function Capteur() {
                     >
                       Delete
                     </button>
+                    <button
+  type="button"
+  className="btn btn-outline-warning btn-sm me-2"
+  onClick={() => loadAlertes(capteur.id)}
+>
+  Alertes
+</button>
+<td>
+</td>
+
+
+
                   </td>
                 </tr>
               );
