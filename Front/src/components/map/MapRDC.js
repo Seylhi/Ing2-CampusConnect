@@ -47,19 +47,19 @@ function MapRDC() {
   const [selectedSalleId, setSelectedSalleId] = useState(null);
   const [salleSelectionnee, setSalleSelectionnee] = useState(null);
 
-  /* 👉 Seules ces salles affichent des infos */
+  /*  Seules ces salles affichent des infos */
   const SALLES_AVEC_INFOS = [16, 14]; // TD5 = 16, TD3 = 14
 
   const handleSalleClick = (idSalle) => {
     setSelectedSalleId(idSalle);
 
-    // ❌ Pas d'infos pour les autres salles
+    //  Pas d'infos pour les autres salles
     if (!SALLES_AVEC_INFOS.includes(idSalle)) {
       setSalleSelectionnee(null);
       return;
     }
 
-    // ✅ TD5 ou TD3 uniquement
+    //  TD5 ou TD3 uniquement
     axios
       .get(`${LOCAL_HOST_SALLE}${idSalle}`)
       .then((res) => setSalleSelectionnee(res.data))
