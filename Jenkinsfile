@@ -12,7 +12,12 @@ pipeline {
  
     stages {
         
- 
+        stage('Checkout SCM') {
+            steps {
+                checkout scm
+            }
+        }
+        
         stage('Build Backend') {
             steps {
                 dir('Back') {
