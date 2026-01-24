@@ -60,6 +60,17 @@ pipeline {
             }
         }
 
+        stage('Start Backend (Integration)') {
+            steps {
+                sshagent(credentials: ['back-ssh-key']) {
+                    sh """
+                    echo ">>> Lancement du backend"
+                    ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST}:${DEPLOY_DIR}
+                    """
+                }
+            }
+        }
+
     }
  
     post {
