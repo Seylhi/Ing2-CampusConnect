@@ -71,6 +71,16 @@ pipeline {
                 """
                 }
             }
+
+            steps {
+                sshagent(credentials: ['front-ssh-key']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${FRONT_USER}@${FRONT_HOST} '
+                        sudo systemctl reload nginx
+                    '
+                    """
+                }
+            }
         }
 
     }
