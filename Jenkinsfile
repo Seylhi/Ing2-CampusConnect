@@ -64,9 +64,11 @@ pipeline {
             steps {
                 sshagent(credentials: ['back-ssh-key']) {
                     sh """
-                    echo ">>> Lancement du backend"
-                    ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST}:${DEPLOY_DIR}
-                    """
+                    ssh ${SSH_USER}@${SSH_HOST} '
+                        chmod +x /home/back/start-back.sh
+                        /home/back/start-back.sh
+                    '
+                """
                 }
             }
         }
