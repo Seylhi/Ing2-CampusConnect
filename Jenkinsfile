@@ -71,7 +71,8 @@ pipeline {
                 """
                 }
             }
-
+        }     
+        stage('Start frontend (Integration)') {
             steps {
                 sshagent(credentials: ['front-ssh-key']) {
                     sh """
