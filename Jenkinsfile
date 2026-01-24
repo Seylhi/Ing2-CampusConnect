@@ -60,6 +60,30 @@ pipeline {
             }
         }
 
+        stage('Start Backend (Integration)') {
+            steps {
+                sshagent(credentials: ['back-ssh-key']) {
+                    sh """
+                    ssh ${SSH_USER}@${SSH_HOST} '
+                        chmod +x /home/back/start-back.sh
+                        /home/back/start-back.sh
+                    '
+                """
+                }
+            }
+        }     
+        stage('Start frontend (Integration)') {
+            steps {
+                sshagent(credentials: ['front-ssh-key']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${FRONT_USER}@${FRONT_HOST} '
+                        sudo systemctl reload nginx
+                    '
+                    """
+                }
+            }
+        }
+
     }
  
     post {
