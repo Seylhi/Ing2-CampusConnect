@@ -1,4 +1,5 @@
 package esiag.back.models.salle;
+
 import lombok.Data;
 import javax.persistence.*;
 
@@ -32,5 +33,13 @@ public class Salle {
 
     @Column(name = "chauffage")
     private boolean chauffage;
+
+    // On ajoute ces deux éléments car on en aura besoin pour calculer le score de
+    // confort
+    @Column(name = "temperature")
+    private Double temperature;
+
+    @Column(name = "humidite")
+    private Double humidite;
 
 }

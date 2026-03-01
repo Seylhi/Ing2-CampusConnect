@@ -8,22 +8,39 @@ import java.util.Map;
 
 public class SalleScoreResult {
 
-    private double score;
-    private Map<String, Double> details;
+    private double scoreEnergie; // renomage de la valeur pour ne pas être perdu par la suite
+    private double scoreConfort; // ajout d'un nouveau score de confort
+
+    // on adapte donc le code avec notre nouvelle valeur !
+    private Map<String, Double> detailsEnergie;
+    private Map<String, Double> detailsConfort;
     private LocalDateTime calculationTime;
 
-    public SalleScoreResult(double score, Map<String, Double> details) {
-        this.score = score;
-        this.details = details;
+    public SalleScoreResult(double scoreEnergie, double scoreConfort,
+            Map<String, Double> detailsEnergie,
+            Map<String, Double> detailsConfort) {
+
+        this.scoreEnergie = scoreEnergie;
+        this.scoreConfort = scoreConfort;
+        this.detailsEnergie = detailsEnergie;
+        this.detailsConfort = detailsConfort;
         this.calculationTime = LocalDateTime.now();
     }
 
-    public double getScore() {
-        return score;
+    public double getScoreEnergie() {
+        return scoreEnergie;
     }
 
-    public Map<String, Double> getDetails() {
-        return details;
+    public double getScoreConfort() {
+        return scoreConfort;
+    }
+
+    public Map<String, Double> getDetailsEnergie() {
+        return detailsEnergie;
+    }
+
+    public Map<String, Double> getDetailsConfort() {
+        return detailsConfort;
     }
 
     public LocalDateTime getCalculationTime() {
