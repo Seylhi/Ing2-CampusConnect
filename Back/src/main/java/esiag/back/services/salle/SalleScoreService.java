@@ -3,6 +3,10 @@
 
 package esiag.back.services.salle;
 
+// on va utiliser des éléments de CapteurRepository donc on 
+// ramène les datas nécessaires
+import esiag.back.models.capteur.Capteur;
+import esiag.back.repositories.capteur.CapteurRepository;
 import esiag.back.models.salle.Salle;
 import org.springframework.stereotype.Service;
 
@@ -13,17 +17,35 @@ import java.util.Map;
 @Service
 public class SalleScoreService {
 
+    // initialisation de CapteurRepository sur l'exemple de
+    // SalleService
     private final SalleService salleService;
+    private final CapteurRepository capteurRepository;
 
-    public SalleScoreService(SalleService salleService) {
+    public SalleScoreService(SalleService salleService, CapteurRepository capteurRepository) {
         this.salleService = salleService;
+        this.capteurRepository = capteurRepository;
     }
 
     public SalleScoreResult calculateScore(Long idSalle) {
         Salle salle = salleService.findByIdSalle(idSalle);
         if (salle == null)
-            // il faut adopter à deux éléments désormais
-            return new SalleScoreResult(0.0, 0.0, Map.of(), Map.of());
+            // il faut adopter à 6 éléments désormais
+            return new SalleScoreResult(0.0, 0.0, Map.of(), Map.of(), 0.0, 0.0);
+
+        Capteur capteurTemp = capteurRepository
+                .findTopByIdSalleAndTypeOrderByDateMesureDesc(idSalle, "TEMPERATURE");
+
+        Capteur capteurHum = capteurRepository
+                .findTopByIdSalleAndTypeOrderByDateMesureDesc(idSalle, "HUMIDITE");
+
+        if (capteurTemp != null) {
+            salle.setTemperature(capteurTemp.getTemperature());
+        }
+
+        if (capteurHum != null) {
+            salle.setHumidite(capteurHum.getHumidite());
+        }
 
         // SCORE ENERGIE
         // Récupération de toutes les salles pour min/max (utile pour avoir une vue
@@ -93,7 +115,9 @@ public class SalleScoreService {
                 score,
                 scoreConfort,
                 details,
-                detailsConfort);
+                detailsConfort,
+                salle.getTemperature(),
+                salle.getHumidite());
     }
 
     // On calcule le score de confort avec une méthode de calcul primaire car moins

@@ -82,6 +82,8 @@ export default function Salle() {
               <th>Fenêtres</th>
               <th>Orientation</th>
               <th>Chauffage</th>
+              <th>Température</th>
+              <th>Humidité</th>
               <th>Score énergétique</th>
               <th>Score confort</th>
             </tr>
@@ -104,12 +106,14 @@ export default function Salle() {
                 <tr key={index}>
                   <td>{salle.idSalle}</td>
                   <td>{salle.nomSalle}</td>
-                  <td>{salle.capacite}</td>
+                  <td>{salle.capacite} personnes</td>
                   <td>{salle.estSalleTp ? "Oui" : "Non"}</td>
                   <td>{salle.surfaceM2} m²</td>
                   <td>{salle.nbFenetres}</td>
                   <td>{salle.orientation}</td>
                   <td>{salle.chauffage ? "Oui" : "Non"}</td>
+                  <td>{result?.temperature} °C</td>
+                  <td>{result?.humidite} %</td>
 
                   <td>
                     {result?.scoreEnergie != null
@@ -121,7 +125,7 @@ export default function Salle() {
                         className="btn btn-sm btn-warning ms-2" // permet de mettre le bouton en jaune
                         onClick={() => {
                           alert(
-                            `Score final : ${result.scoreEnergie != null ? result.scoreEnergie.toFixed(0) : "N/A"} / 100 (${energyLetter})
+                            `Score énergétique : ${result.scoreEnergie != null ? result.scoreEnergie.toFixed(0) : "N/A"} / 100 (${energyLetter})
 Interprétation : ${result.scoreEnergie != null
                               ? result.scoreEnergie >= 75
                                 ? "Salle très économe en énergie"
@@ -178,11 +182,20 @@ Calcul effectué le : ${result.calculationTime
                         onClick={() => {
                           alert(
                             `Score confort : ${result.scoreConfort.toFixed(0)} / 100
-Interprétation : ${confortLetter}
+Interprétation : ${result.scoreConfort != null
+                              ? result.scoreConfort >= 75
+                                ? "Salle très confortable"
+                                : result.scoreConfort >= 50
+                                  ? "Salle assez confortable"
+                                  : result.scoreConfort >= 25
+                                    ? "Salle peu confortable"
+                                    : "Salle non confortable"
+                              : "N/A"
+                            }
 
 Données brutes
-Température : ${salle.temperature ?? "N/A"} °C
-Humidité : ${salle.humidite ?? "N/A"} %
+Température : ${result.temperature ?? "N/A"} °C
+Humidité : ${result.humidite ?? "N/A"} %
 Capacité : ${salle.capacite ?? "N/A"} personnes
 Surface : ${salle.surfaceM2 ?? "N/A"} m²
 Fenêtres : ${salle.nbFenetres ?? "N/A"}
@@ -197,9 +210,16 @@ Luminosité = ${dC.scoreLuminosite ?? "N/A"} / 15
 Type salle = ${dC.scoreTypeSalle ?? "N/A"} / 15
 
 Formule finale :
-Score confort = Somme des contributions`
-                          );
+Score confort = Somme des contributions
 
+
+Calcul effectué le : ${result.calculationTime
+                              ? new Date(
+                                result.calculationTime,
+                              ).toLocaleString()
+                              : "N/A"
+                            }`,
+                          );
                         }}
                       >
                         Détails
