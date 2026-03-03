@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface CapteurRepository extends JpaRepository<Capteur, Long> {
     List<Capteur> findByIdSalleOrderByIdSalleAsc(Long idSalle);
+    Capteur findTopByIdSalleAndTypeOrderByDateMesureDesc(Long idSalle, String type);
 
 }

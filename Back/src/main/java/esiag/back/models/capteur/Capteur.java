@@ -31,4 +31,7 @@ public class Capteur {
 
     @Column(name = "chauffage_on")
     private Boolean chauffageOn;
+
+    @Column(name = "type")
+    private String type;
 }
