@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import App from "./App";
 import Salle from "./Salle";
-import Capteur from "./Capteur";
+import Capteur from "./capteur/Capteur";
 import Navbar from "./Navbar";
 import Map from "./Map";
 import Offres from "./Offres";
