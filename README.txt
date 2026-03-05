@@ -9,11 +9,15 @@ CORCHER Ethan
 # User Stories (liés à la Release 2)
 
 CORCHER Ethan -
-US1 - Relever les informations des salles remplies manuellement
-US2 - Notifier l’utilisateur en cas de données manquantes ou incohérentes
-US3 - Calculer le score énergétique à partir des données normalisées
-US4 - Lier le calcul énergétique à la base de donnée PSQL
-US5 - Afficher le score énergétique calculé
+US1 - S’informer sur les différentes technologies utilisées (Spring, React, Vite)
+US2 - Remplir le formulaire d'attribution des salles
+US3 - Visualiser les données utiles au calcul de confort (température, confort)
+US4 - Calculer un score de confort
+US5 - Lier le calcul de confort à la base de données PSQL (issues de la table capteur)
+US6 - Rendre le score explicable (détail énergie / confort / capacité)
+US7 - Recalculer automatiquement les scores lors d’une mise à jour d’un paramètre
+US8 - Définir les critères d’attribution d’une salle
+US9 - Implémenter la sélection automatique de la meilleure salle
 
 
 REDJECHTA Abderraouf -
