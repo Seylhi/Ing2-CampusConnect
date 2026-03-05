@@ -7,12 +7,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("salle")
 
-// Dans notre cas, on va se concentrer uniquement sur l'affichage car les données des salle sne sont pas vouées à changer
+// Dans notre cas, on va se concentrer uniquement sur l'affichage car les
+// données des salle sne sont pas vouées à changer
 // du moins pas encore !
 public class SalleController {
 
@@ -31,5 +33,28 @@ public class SalleController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(salle, HttpStatus.OK);
+    }
+
+    // Permets de calculer notre attribution de salle en fonction des éléments
+    // remplies par l'user
+    @GetMapping("forms")
+    public ResponseEntity<List<Salle>> calcSalles(
+            @RequestParam int nbPersonnes,
+            @RequestParam boolean tp) {
+
+        List<Salle> salles = salleService.findAllSalles();
+        List<Salle> calcSalles = new ArrayList<>();
+
+        for (Salle s : salles) {
+            // On s'assure que la capacité est bien supérieur à la demande
+            if (s.getCapacite() >= nbPersonnes) {
+                // On relève si le client a choisi oui ou non une salle TP
+                if (!tp || s.isEstSalleTp()) {
+                    calcSalles.add(s);
+                }
+            }
+        }
+
+        return new ResponseEntity<>(calcSalles, HttpStatus.OK);
     }
 }
