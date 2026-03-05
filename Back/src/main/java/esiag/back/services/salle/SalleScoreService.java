@@ -4,34 +4,43 @@
 package esiag.back.services.salle;
 
 // on va utiliser des éléments de CapteurRepository donc on 
-// ramène les datas nécessaires
+// ramène les datas nécessaires, on ramène également celle de 
+// SalleMockJournalier car désormais utilisable
 import esiag.back.models.capteur.Capteur;
 import esiag.back.repositories.capteur.CapteurRepository;
+import esiag.back.repositories.salle.SalleMockJournalierRepository;
 import esiag.back.models.salle.Salle;
+import esiag.back.models.salle.SalleMockJournalier;
+
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.time.LocalDate; // utile pour notre mock journalier
 
 @Service
 public class SalleScoreService {
 
-    // initialisation de CapteurRepository sur l'exemple de
-    // SalleService
+    // initialisation de CapteurRepository et de SalleMockJournalier sur l'exemple
+    // de SalleService
     private final SalleService salleService;
     private final CapteurRepository capteurRepository;
+    private final SalleMockJournalierRepository mockRepository;
 
-    public SalleScoreService(SalleService salleService, CapteurRepository capteurRepository) {
+    public SalleScoreService(SalleService salleService, CapteurRepository capteurRepository,
+            SalleMockJournalierRepository mockRepository) {
         this.salleService = salleService;
         this.capteurRepository = capteurRepository;
+        this.mockRepository = mockRepository;
     }
 
     public SalleScoreResult calculateScore(Long idSalle) {
         Salle salle = salleService.findByIdSalle(idSalle);
+        LocalDate localDate = LocalDate.now();
         if (salle == null)
             // il faut adopter à 6 éléments désormais
-            return new SalleScoreResult(0.0, 0.0, Map.of(), Map.of(), 0.0, 0.0);
+            return new SalleScoreResult(0.0, 0.0, Map.of(), Map.of(), 0.0, 0.0, 0.0, 0.0);
 
         Capteur capteurTemp = capteurRepository
                 .findTopByIdSalleAndTypeOrderByDateMesureDesc(idSalle, "TEMPERATURE");
@@ -39,6 +48,11 @@ public class SalleScoreService {
         Capteur capteurHum = capteurRepository
                 .findTopByIdSalleAndTypeOrderByDateMesureDesc(idSalle, "HUMIDITE");
 
+        SalleMockJournalier mockJournalier = mockRepository
+                .findByIdSalleAndDateJour(salle.getIdSalle(), localDate);
+
+        // C'est ici que l'on déclare nos variables provenant de capteurs afin de
+        // garder la même forme mais avec des données liées à celle de Capteur
         if (capteurTemp != null) {
             salle.setTemperature(capteurTemp.getTemperature());
         }
@@ -56,6 +70,13 @@ public class SalleScoreService {
         int minFen = all.stream().mapToInt(Salle::getNbFenetres).min().orElse(0);
         int maxFen = all.stream().mapToInt(Salle::getNbFenetres).max().orElse(1);
 
+        // Données provenant de notre mock pour venir préciser notre calcul de score
+        // énergétique, on fait exprès de ne pas gérer le null car table jamais vide,
+        // même si il est vrai qu'il serait plus propre de le faire
+        double coefMeteo = mockJournalier.getCoefficientMeteo();
+        double coefVacances = mockJournalier.getCoefficientVacances();
+        double temperatureExt = mockJournalier.getTemperatureExterieure();
+
         // Normalisation des données
         double surfaceNorm = (maxSurface - minSurface != 0)
                 ? (salle.getSurfaceM2() - minSurface) / (maxSurface - minSurface)
@@ -64,10 +85,9 @@ public class SalleScoreService {
                 ? (double) (salle.getNbFenetres() - minFen) / (maxFen - minFen)
                 : 0;
         double chauffageVal = salle.isChauffage() ? 1.0 : 0.0;
-        double orientCoef = switch (salle.getOrientation()) { // En effet l'orientation a un effet sur
-            // la réception des rayons du soleil et donc par la même occasion de chaleur
-            // donc le chauffage
-            // y sera moins important
+        double orientCoef = switch (salle.getOrientation()) {
+            // En effet l'orientation a un effet sur la réception des rayons du soleil et
+            // donc par la même occasion de chaleur donc le chauffage y sera moins important
             case "SUD" -> 1.0;
             case "EST", "OUEST" -> 0.6;
             default -> 0.2;
@@ -75,14 +95,34 @@ public class SalleScoreService {
 
         // Calcul avec les coefficients (ils sont choisis en fonction de l'importance du
         // caractère)
-        double contribSurface = (1 - surfaceNorm) * 0.40;
-        double contribFen = fenNorm * 0.30;
+        double contribSurface = (1 - surfaceNorm) * 0.30;
+        double contribFen = fenNorm * 0.25;
         double contribOrient = orientCoef * 0.20;
-        double contribChauffage = (1 - chauffageVal) * 0.10;
+        double contribChauffage = (1 - chauffageVal) * 0.25;
+        // Impact de la température sur le chauffage, difficulté à chauffer correctement
+        // quand il fait plus froid
+        double coefTemp;
+        if (temperatureExt < 0) {
+            coefTemp = 0.75;
+        } else if (temperatureExt < 10) {
+            coefTemp = 0.85;
+        } else if (temperatureExt < 20) {
+            coefTemp = 0.95;
+        } else {
+            coefTemp = 1.0;
+        }
 
-        double score = 100 * (contribSurface + contribFen + contribOrient + contribChauffage);
+        // Score brut avec ajout des différents coefficients provenant de la table mock
+        // de salle, ils sont tous inférieurs à 1 pour ne pas impacter le score
+        // au-dessus de sa valeur max
+        double score = (100
+                * (contribSurface + (contribFen * coefMeteo) + contribOrient + (contribChauffage * coefTemp)))
+                * coefVacances;
 
         // Détails de calcul à afficher sur le front
+        // On affichera pas les coefficients du mock dans notre tableau mais à venir,
+        // j'ajouterai les nouveaux calculs dans l'alerte du site(lorsque l'on clique
+        // sur le bouton)
 
         // Valeurs bruts
         Map<String, Double> details = new HashMap<>();
@@ -117,7 +157,9 @@ public class SalleScoreService {
                 details,
                 detailsConfort,
                 salle.getTemperature(),
-                salle.getHumidite());
+                salle.getHumidite(),
+                coefMeteo,
+                coefVacances);
     }
 
     // On calcule le score de confort avec une méthode de calcul primaire car moins

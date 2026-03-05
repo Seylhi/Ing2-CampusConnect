@@ -142,19 +142,18 @@ Surface : ${dE.surface != null ? dE.surface : "N/A"} m²
 Fenêtres : ${dE.fenetres != null ? dE.fenetres : "N/A"}
 Orientation (coef) : ${dE.orientationCoef != null ? dE.orientationCoef : "N/A"}
 Chauffage : ${dE.chauffage === 1 ? "Oui" : dE.chauffage === 0 ? "Non" : "N/A"}
+Coefficient météo : ${result.coefMeteo ?? "N/A"}
 
-Normalisation
-SurfaceNorm = ${dE.surfaceNorm != null ? dE.surfaceNorm.toFixed(0) : "N/A"}
-FenêtresNorm = ${dE.fenetresNorm != null ? dE.fenetresNorm.toFixed(0) : "N/A"}
-
-Pondération
-(1 - SurfaceNorm) × 0.40 = ${dE.contribSurface != null ? dE.contribSurface.toFixed(3) : "N/A"}
-FenêtresNorm × 0.30 = ${dE.contribFen != null ? dE.contribFen.toFixed(3) : "N/A"}
-OrientationCoef × 0.20 = ${dE.contribOrient != null ? dE.contribOrient.toFixed(3) : "N/A"}
-(1 - Chauffage) × 0.10 = ${dE.contribChauffage != null ? dE.contribChauffage.toFixed(3) : "N/A"}
+Normalisation & Pondération
+Surface normalisée : ${dE.surfaceNorm != null ? dE.surfaceNorm.toFixed(2) : "N/A"}
+Fenêtres normalisées : ${dE.fenetresNorm != null ? dE.fenetresNorm.toFixed(2) : "N/A"}
+Contribution Surface : (1 - SurfaceNorm (${dE.surfaceNorm.toFixed(2)})) × 0.30 = ${dE.contribSurface != null ? dE.contribSurface.toFixed(2) : "N/A"}
+Contribution Fenêtres : FenêtresNorm (${dE.fenetresNorm.toFixed(2)}) × 0.25 × CoefMétéo = ${dE.contribFen != null ? dE.contribFen.toFixed(2) : "N/A"}
+Contribution Orientation : OrientationCoef (${dE.orientationCoef.toFixed(2)}) × 0.20 × CoefMétéo (${result.coefMeteo.toFixed(2)})= ${dE.contribOrient != null ? dE.contribOrient.toFixed(2) : "N/A"}
+Contribution Chauffage : (1 - Chauffage (${dE.chauffage.toFixed(2)})) × 0.25 × CoefTemp = ${dE.contribChauffage != null ? dE.contribChauffage.toFixed(2) : "N/A"}
 
 Formule finale :
-Score = (Σ contributions) × 100
+Score final après vacances = Score énergétique brut (${result.scoreEnergie.toFixed(2)}) × CoefVacances (${result.coefVacances.toFixed(2)})
 
 Calcul effectué le : ${result.calculationTime
                               ? new Date(
