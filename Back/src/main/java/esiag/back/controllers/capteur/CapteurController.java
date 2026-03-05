@@ -57,4 +57,20 @@ public class CapteurController {
         }
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
+
+   @PostMapping("/salle/{idSalle}/chauffage/on")
+   public ResponseEntity<Void> activerChauffageSalle(@PathVariable Long idSalle) {
+
+    List<Capteur> capteurs = capteurService.findBySalle(idSalle);
+    if (capteurs.isEmpty()) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    for (Capteur c : capteurs) {
+        c.setChauffageOn(true);
+        capteurService.save(c);
+    }
+
+    return new ResponseEntity<>(HttpStatus.OK);
+}
 }

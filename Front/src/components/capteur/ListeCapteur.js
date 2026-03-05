@@ -1,6 +1,16 @@
 import React from "react";
 
-export default function ListeCapteur({ capteur, resultat, onSupprimer, onAfficherAlertes }) {
+export default function ListeCapteur({ capteur, resultat, onSupprimer, onAfficherAlertes, onActiverChauffage }) {
+
+  const seuil_temperature = 19;
+  const temperatureSousSeuil = capteur.temperature !== null && capteur.temperature < seuil_temperature;
+
+  let styleTemperature = { color: "black", fontWeight: "normal" };
+
+if (temperatureSousSeuil) {
+  styleTemperature.color = "red";
+  styleTemperature.fontWeight = "bold";
+}
 
   const afficherDetails = () => {
     if (!resultat) return;
@@ -48,13 +58,12 @@ export default function ListeCapteur({ capteur, resultat, onSupprimer, onAffiche
       `=> Cette salle est "${intervalle}" car son score total est ${resultat.score.toFixed(2)}`
     );
   };
-
   return (
     <tr>
       <th>{capteur.id}</th>
       <td>{capteur.idSalle}</td>
-      <td>{capteur.temperature}</td>
       <td>{capteur.humidite}</td>
+      <td style={styleTemperature}>{capteur.temperature}</td>
       <td>{capteur.presence ? "Oui" : "Non"}</td>
       <td>{capteur.dateMesure?.substring(0, 10)}</td>
       <td>{capteur.fenetreOuverte ? "Oui" : "Non"}</td>
@@ -90,6 +99,13 @@ export default function ListeCapteur({ capteur, resultat, onSupprimer, onAffiche
         <button className="btn btn-sm btn-outline-warning" onClick={() => onAfficherAlertes(capteur.id)}>
           Alertes
         </button>
+
+      {temperatureSousSeuil && !capteur.chauffageOn && (
+  <button
+    className="btn btn-sm btn-danger me-2" onClick={() => onActiverChauffage(capteur.idSalle)}>
+    Activer chauffage
+  </button>
+)}
       </td>
     </tr>
   );

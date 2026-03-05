@@ -17,6 +17,24 @@ export default function Capteur() {
   const [scoreSelectionne, setScoreSelectionne] = useState(null);
   const [donneesAlertes, setDonneesAlertes] = useState([]);
 
+ const activerChauffage = async (idSalle) => {
+  try {
+    await axios.post(`${LOCAL_HOST}/capteur/salle/${idSalle}/chauffage/on`);
+
+    const nouveauxCapteurs = capteurs.map((c) => {
+      if (c.idSalle === idSalle) {
+        c.chauffageOn = true;  
+      }
+      return c;
+    });
+
+    setCapteurs(nouveauxCapteurs);
+
+  } catch (error) {
+    console.log("Erreur lors de l'activation du chauffage");
+  }
+};
+
   const chargerCapteurs = async () => {
     try {
       const reponse = await axios.get(GET_CAPTEURS);
@@ -91,8 +109,8 @@ export default function Capteur() {
           <tr>
             <th>Id</th>
             <th>Id Salle</th>
-            <th>Température</th>
             <th>Humidité</th>
+            <th>Température</th>
             <th>Présence</th>
             <th>Date mesure</th>
             <th>Fenêtre</th>
@@ -118,6 +136,7 @@ export default function Capteur() {
                   capteur={capteur}
                   resultat={resultatsScores[capteur.idSalle]}
                   onSupprimer={confirmerSuppressionCapteur}
+                  onActiverChauffage={activerChauffage}
                   onAfficherDetails={(c, r) => {
                     setCapteurSelectionne(c);
                     setScoreSelectionne(r);
