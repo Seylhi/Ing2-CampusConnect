@@ -6,6 +6,7 @@ import Capteur from "./capteur/Capteur";
 import Navbar from "./Navbar";
 import Map from "./Map";
 import Offres from "./Offres";
+import JobDating from "./JobDating";
 import NotFound from "./NotFound";
 
 export default function Router() {
@@ -19,6 +20,7 @@ export default function Router() {
           <Route path="/capteur" element={<Capteur />} />
           <Route path="/map" element={<Map />} />
           <Route path="/offres" element={<Offres />} />
+          <Route path="/jobdating" element={<JobDating />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

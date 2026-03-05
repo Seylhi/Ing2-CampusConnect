@@ -20,6 +20,7 @@ export default function Navbar() {
         <Link to="/capteur">Capteurs</Link>
         <Link to="/map">Carte</Link>
         <Link to="/offres">Offres</Link>
+        <Link to="/jobdating">Job Dating</Link>
       </div>
     </nav>
   );
