@@ -6,7 +6,8 @@ KHEDIM Mohammed
 REDJECHTA Abderraouf
 CORCHER Ethan
 
-# User Stories (liés à la Release 1)
+# User Stories (liés à la Release 2)
+
 CORCHER Ethan -
 US1 - Relever les informations des salles remplies manuellement
 US2 - Notifier l’utilisateur en cas de données manquantes ou incohérentes
@@ -24,15 +25,13 @@ US5 - Rechercher une salle
 US6 - Filtrer les salles
 
 HBADA Ilyes - 
-US1 – Récupérer les données des capteurs depuis le backend
-US2 – Associer les capteurs à une salle via une clé étrangère
-US3 – Calculer automatiquement le score d’une salle à partir des capteurs
-US4 – Normaliser les valeurs de température et d’humidité (score entre 0 et 1)
-US5 – Déterminer le statut d’une salle (Très bonne / Bonne / Moyenne / Mauvaise)
-US6 – Exposer une API REST dédiée au score d’une salle (/salle/score/{id})
-US7 – Afficher le statut d’une salle dans l’interface utilisateur
-US8 – Visualiser le détail du calcul du score (valeurs réelles, formules, pondérations)
-US9 – Expliquer les critères et seuils utilisés pour le calcul du score dans le front
+US1-Associer utilité capteurs(temperature, humidité présence et donc calculer le score via ça)
+US2-Créer vue capteurs(voir tout les capeur par salle)
+US3-Définir indicateurs monitoring	
+US4-Agréger données par salle du monitoring 	
+US5-Afficher état global des salles	dan le monitoring 
+US6-Définir seuils activation des capteurs
+US7-Implémenter regle activiation des capteurs manuellement si seuil de temprature depassé
 
 KHEDIM Mohammed - 
 
