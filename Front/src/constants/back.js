@@ -1,5 +1,5 @@
-//export const LOCAL_HOST = "http://172.31.253.207:8080";
-export const LOCAL_HOST = "http://localhost:8080";
+export const LOCAL_HOST = "http://172.31.253.207:8080";
+//export const LOCAL_HOST = "http://localhost:8080";
 
 export const LOCAL_HOST_SALLE = LOCAL_HOST + "/salle/";
 export const GET_SALLES = LOCAL_HOST_SALLE + "all";
