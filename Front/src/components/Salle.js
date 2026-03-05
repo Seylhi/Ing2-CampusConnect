@@ -6,6 +6,10 @@ import { GET_SALLES, LOCAL_HOST_SALLE } from "../constants/back";
 export default function Salle() {
   const [salles, setSalles] = useState([]);
   const [scoreResults, setScoreResults] = useState({});
+  // Implémentation de nos nouvelles constantes afin de gérer l'attribution des salles
+  const [nbPersonnes, setNbPersonnes] = useState();
+  const [tp, setTp] = useState(false);
+  const [calculResults, setCalculResults] = useState([]);
 
   // Charger les salles
   const loadSalles = async () => {
@@ -32,7 +36,7 @@ export default function Salle() {
           }));
         })
         .catch((err) => {
-          console.error("Erreur chargement score:", err);
+          console.error("Erreur chargement du score énergétique :", err);
           setScoreResults((prev) => ({
             ...prev,
             [salle.idSalle]: null,
@@ -64,6 +68,31 @@ export default function Salle() {
     if (score >= 50) return "C";
     if (score >= 30) return "D";
     return "E";
+  };
+
+  // Fonction pour retourner la lettre selon le score global, même principe 
+  // que pour les autres scores
+  const getGlobalLetter = (score) => {
+    if (score >= 85) return "A";
+    if (score >= 70) return "B";
+    if (score >= 50) return "C";
+    if (score >= 30) return "D";
+    return "E";
+  };
+
+  // Permets de mettre en place notre attribution de salle à venir
+  const calcSalles = async () => {
+    axios
+      .get(`${LOCAL_HOST_SALLE}forms?nbPersonnes=${nbPersonnes}&tp=${tp}`)
+      .then((res) => {
+        setCalculResults(res.data);
+        loadScores(res.data);
+        // on se base sur la méthode précédente, 
+        // pour avoir les mêmes datas
+      })
+      .catch((err) => {
+        alert("Erreur lors du calcul d'attribution : " + err);
+      });
   };
 
   // Tableau avec les salles et leurs scores
@@ -211,7 +240,6 @@ Type salle = ${dC.scoreTypeSalle ?? "N/A"} / 15
 Formule finale :
 Score confort = Somme des contributions
 
-
 Calcul effectué le : ${result.calculationTime
                               ? new Date(
                                 result.calculationTime,
@@ -231,14 +259,98 @@ Calcul effectué le : ${result.calculationTime
             })}
           </tbody>
         </table>
-        <div className="text-center mt-4">
-          <button
-            className="btn btn-primary"
-            onClick={() => window.open("/docs/norms.pdf")}
-          >
-            Documentation - normalisation et du calcul de score
+
+        <div className="mb-3">
+          <h5>Calcul de salle - en fonction de l'occupation prévue</h5>
+
+          <input
+            type="number"
+            placeholder="Nombre de personnes" // Valeur dans notre case pour renseigner la valeur à enregistrer 
+            value={nbPersonnes}
+            onChange={(e) => setNbPersonnes(e.target.value)}
+          />
+
+          <label className="ms-2">
+            Salle de TP
+            <input
+              className="ms-2" // permet de mettre une marge et rendre la box plus visible
+              type="checkbox"
+              checked={tp}
+              onChange={(e) => setTp(e.target.checked)}
+            />
+          </label>
+
+          <button className="btn btn-secondary ms-2" onClick={calcSalles}>
+            Calculer
           </button>
         </div>
+
+        <button
+          // Ce bouton remet tous les paramètres dans leur format initial
+          className="btn btn-outline-secondary"
+          onClick={() => {
+            setCalculResults([]);
+            setNbPersonnes("");
+            setTp(false);
+          }}
+        >
+          Réinitialiser
+        </button>
+        {calculResults.length > 0 && (
+          // on affiche le tableau si on a des éléments sont présents dans notre result
+          <div className="mt-4">
+            <h5>Résultat du calcul global en fonction de l'occupation </h5>
+
+            <table className="table table-sm table-bordered">
+              <thead>
+                <tr>
+                  <th>Salle</th>
+                  <th>Score énergétique</th>
+                  <th>Score confort</th>
+                  <th>Score global</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {calculResults
+                  .sort((a, b) => {
+                    // basée sur une méthode Array que j'ai trouvé sur un forum qui permet d'étudier deux éléments qui 
+                    // se suivent dans une liste. Si la soustraction de A et B est positive alors, décroissant !
+                    const A = (scoreResults[a.idSalle]?.scoreEnergie) + (scoreResults[a.idSalle]?.scoreConfort);
+                    const B = (scoreResults[b.idSalle]?.scoreEnergie) + (scoreResults[b.idSalle]?.scoreConfort);
+                    return B - A;
+                  })
+
+                  .map((salle) => {
+                    const result = scoreResults[salle.idSalle];
+                    const energyScore = result?.scoreEnergie;
+                    const confortScore = result?.scoreConfort;
+                    const globalScore = (result.scoreEnergie + result.scoreConfort) / 2;
+                    const energyLetter = getEnergyLetter(energyScore);
+                    const confortLetter = getComfortLetter(confortScore);
+                    const globalLetter = getGlobalLetter(globalScore);
+
+                    return (
+                      <tr key={salle.idSalle}>
+                        <td>{salle.nomSalle}</td>
+                        <td>{energyScore ? `${energyScore.toFixed(0)} (${energyLetter})` : "N/A"}</td>
+                        <td>{confortScore ? `${confortScore.toFixed(0)} (${confortLetter})` : "N/A"}</td>
+                        <td>{globalScore ? `${globalScore.toFixed(0)} (${globalLetter})` : "N/A"}</td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
+        )}
+        <button
+          className="btn btn-secondary mt-4 mb-4"
+          // on a rajouté une marge en bas pour rendre le bouton 
+          // plus visible, avant il était collé au bas de la page ...
+          onClick={() => window.open("/docs/norms.pdf")}
+        >
+          Documentation - normalisation et du calcul de score
+        </button>
       </div>
     </div>
   );
