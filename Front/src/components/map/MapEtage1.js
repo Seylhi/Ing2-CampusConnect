@@ -82,12 +82,21 @@ function MapEtage1() {
     return matchSearch || matchFilter;
   };
 
-  const handleSalleClick = (idSalle) => {
+  const handleSalleClick = async (idSalle) => {
     setSelectedSalleId(idSalle);
-    axios
-      .get(`${LOCAL_HOST_SALLE}${idSalle}`)
-      .then((res) => setSalleSelectionnee(res.data))
-      .catch(() => setSalleSelectionnee(null));
+
+    try {
+      const salleRes = await axios.get(`${LOCAL_HOST_SALLE}${idSalle}`);
+      const scoreRes = await axios.get(`${LOCAL_HOST_SALLE}${idSalle}/score`);
+
+      setSalleSelectionnee({
+        ...salleRes.data,
+        scoreConfort: scoreRes.data.scoreConfort,
+        scoreEnergie: scoreRes.data.scoreEnergie,
+      });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   /* ===== GÉOMÉTRIE ÉTAGE 1 (INCHANGÉE) ===== */
@@ -353,31 +362,113 @@ function MapEtage1() {
         </MapContainer>
 
         {/* ===== INFOS SALLE ===== */}
-        {salleSelectionnee && (
-          <div
-            style={{
-              position: "absolute",
-              right: 20,
-              top: 80,
-              background: "#fff",
-              padding: 15,
-              borderRadius: 8,
-              width: 240,
-              boxShadow: "0 0 10px rgba(0,0,0,0.25)",
-            }}
-          >
-            <h4>{salleSelectionnee.nomSalle}</h4>
-            <p>
-              <b>Capacité :</b> {salleSelectionnee.capacite}
-            </p>
-            <p>
-              <b>TP :</b> {salleSelectionnee.estSalleTp ? "Oui" : "Non"}
-            </p>
-            <p>
-              <b>Chauffage :</b> {salleSelectionnee.chauffage ? "Oui" : "Non"}
-            </p>
-          </div>
-        )}
+        {salleSelectionnee &&
+          (() => {
+            const getStatut = (score) => {
+              if (score >= 80) return { label: "Bonne", color: "#2ecc71" };
+              if (score >= 50) return { label: "Moyenne", color: "#f39c12" };
+              return { label: "Mauvaise", color: "#e74c3c" };
+            };
+
+            const confort = salleSelectionnee.scoreConfort ?? 0;
+            const energie = salleSelectionnee.scoreEnergie ?? 0;
+
+            const statutConfort = getStatut(confort);
+            const statutEnergie = getStatut(energie);
+
+            return (
+              <div
+                style={{
+                  position: "absolute",
+                  right: 20,
+                  top: 80,
+                  background: "#fff",
+                  padding: 15,
+                  borderRadius: 8,
+                  width: 260,
+                  boxShadow: "0 0 15px rgba(0,0,0,0.25)",
+                  borderLeft: `6px solid ${statutConfort.color}`,
+                }}
+              >
+                <h4>{salleSelectionnee.nomSalle}</h4>
+
+                <p>
+                  <b>Capacité :</b> {salleSelectionnee.capacite}
+                </p>
+                <p>
+                  <b>TP :</b> {salleSelectionnee.estSalleTp ? "Oui" : "Non"}
+                </p>
+                <p>
+                  <b>Chauffage :</b>{" "}
+                  {salleSelectionnee.chauffage ? "Oui" : "Non"}
+                </p>
+
+                <hr />
+
+                <div style={{ marginBottom: 15 }}>
+                  <b>Confort :</b> {confort.toFixed(1)} / 100
+                  <div
+                    style={{
+                      background: "#eee",
+                      borderRadius: 10,
+                      height: 10,
+                      marginTop: 6,
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${confort}%`,
+                        background: statutConfort.color,
+                        height: "100%",
+                        borderRadius: 10,
+                        transition: "0.4s ease",
+                      }}
+                    />
+                  </div>
+                  <div
+                    style={{
+                      color: statutConfort.color,
+                      fontWeight: "bold",
+                      marginTop: 4,
+                    }}
+                  >
+                    {statutConfort.label}
+                  </div>
+                </div>
+
+                <div>
+                  <b>Énergie :</b> {energie.toFixed(1)} / 100
+                  <div
+                    style={{
+                      background: "#eee",
+                      borderRadius: 10,
+                      height: 10,
+                      marginTop: 6,
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${energie}%`,
+                        background: statutEnergie.color,
+                        height: "100%",
+                        borderRadius: 10,
+                        transition: "0.4s ease",
+                      }}
+                    />
+                  </div>
+                  <div
+                    style={{
+                      color: statutEnergie.color,
+                      fontWeight: "bold",
+                      marginTop: 4,
+                    }}
+                  >
+                    {statutEnergie.label}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
       </div>
     </>
   );
