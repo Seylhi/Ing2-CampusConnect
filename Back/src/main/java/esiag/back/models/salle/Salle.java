@@ -46,12 +46,4 @@ public class Salle {
     @Column(name = "is_occupee")
     private boolean occupee;
 
-    // Et j'ai ajouté ça pour afficher les scores mais ne pas les stocker en base
-    // juste pour la map
-    @Transient
-    private Double scoreConfort;
-
-    @Transient
-    private Double scoreEnergetique;
-
 }
