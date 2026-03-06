@@ -93,6 +93,12 @@ function MapEtage1() {
         ...salleRes.data,
         scoreConfort: scoreRes.data.scoreConfort,
         scoreEnergie: scoreRes.data.scoreEnergie,
+        detailsEnergie: scoreRes.data.detailsEnergie,
+        detailsConfort: scoreRes.data.detailsConfort,
+        temperature: scoreRes.data.temperature,
+        humidite: scoreRes.data.humidite,
+        coefMeteo: scoreRes.data.coefMeteo,
+        coefVacances: scoreRes.data.coefVacances,
       });
     } catch (err) {
       console.error(err);
@@ -466,6 +472,51 @@ function MapEtage1() {
                     {statutEnergie.label}
                   </div>
                 </div>
+                <button
+                  style={{
+                    marginTop: 15,
+                    padding: "6px 10px",
+                    background: "#2c3e50",
+                    color: "white",
+                    border: "none",
+                    borderRadius: 6,
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    const dE = salleSelectionnee.detailsEnergie || {};
+                    const dC = salleSelectionnee.detailsConfort || {};
+
+                    alert(
+                      `=== DÉTAIL CALCUL SCORE ===
+
+--- CONFORT ---
+Température: ${salleSelectionnee.temperature}°C
+Humidité: ${salleSelectionnee.humidite}%
+
+Score Température: ${dC.scoreTemperature}
+Score Humidité: ${dC.scoreHumidite}
+Score Densité: ${dC.scoreDensite}
+Score Luminosité: ${dC.scoreLuminosite}
+Score Type Salle: ${dC.scoreTypeSalle}
+
+Score Confort Final: ${salleSelectionnee.scoreConfort.toFixed(2)}
+
+--- ÉNERGIE ---
+Surface: ${dE.surface}
+Fenêtres: ${dE.fenetres}
+Orientation Coef: ${dE.orientationCoef}
+Chauffage: ${dE.chauffage}
+
+Coef Météo: ${salleSelectionnee.coefMeteo}
+Coef Vacances: ${salleSelectionnee.coefVacances}
+
+Score Énergie Final: ${salleSelectionnee.scoreEnergie.toFixed(2)}
+`,
+                    );
+                  }}
+                >
+                  Voir détail calcul
+                </button>
               </div>
             );
           })()}
