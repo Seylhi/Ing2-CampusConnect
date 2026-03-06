@@ -1,6 +1,8 @@
 package esiag.back.controllers.salle;
 
 import esiag.back.models.salle.Salle;
+import esiag.back.services.salle.SalleScoreResult;
+import esiag.back.services.salle.SalleScoreService;
 import esiag.back.services.salle.SalleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,14 @@ import java.util.List;
 // données des salle sne sont pas vouées à changer
 // du moins pas encore !
 public class SalleController {
+
+    @Autowired
+    private SalleScoreService salleScoreService;
+
+    @GetMapping("/{id}/score")
+    public SalleScoreResult getSalleScore(@PathVariable Long id) {
+        return salleScoreService.calculateScore(id);
+    }
 
     @Autowired
     private SalleService salleService;
