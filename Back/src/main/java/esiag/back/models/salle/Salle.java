@@ -42,4 +42,8 @@ public class Salle {
     @Column(name = "humidite")
     private Double humidite;
 
+    // j'ai ajouté ça juste pour l'affichage d'occupation dans la map
+    @Column(name = "is_occupee")
+    private boolean occupee;
+
 }
