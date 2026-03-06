@@ -15,4 +15,8 @@ export const UPDATE_CAPTEURS = LOCAL_HOST_CAPTEUR + "update";
 export const GET_OFFRES = LOCAL_HOST + "/api/offres/student/";
 export const GET_SALLE_BY_ID = LOCAL_HOST_SALLE;
 
-export const GET_SALLE_OPTIMALE_JOBDATING = LOCAL_HOST + "/api/jobdating/salle-optimale/";
+export const GET_SALLE_OPTIMALE_JOBDATING =
+  LOCAL_HOST + "/api/jobdating/salle-optimale/";
+export const LOCAL_HOST_MAP = LOCAL_HOST + "/api/map/";
+export const GET_MAP_STATS = LOCAL_HOST_MAP + "stats";
+export const INCREMENT_MAP_CONSULTATION = LOCAL_HOST_MAP + "stats/consultation";

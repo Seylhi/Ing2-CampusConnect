@@ -42,4 +42,16 @@ public class Salle {
     @Column(name = "humidite")
     private Double humidite;
 
+    // j'ai ajouté ça juste pour l'affichage d'occupation dans la map
+    @Column(name = "is_occupee")
+    private boolean occupee;
+
+    // Et j'ai ajouté ça pour afficher les scores mais ne pas les stocker en base
+    // juste pour la map
+    @Transient
+    private Double scoreConfort;
+
+    @Transient
+    private Double scoreEnergetique;
+
 }
