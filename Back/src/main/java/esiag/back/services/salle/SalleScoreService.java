@@ -3,9 +3,10 @@
 
 package esiag.back.services.salle;
 
-// on va utiliser des éléments de CapteurRepository donc on 
-// ramène les datas nécessaires, on ramène également celle de 
+// on va utiliser des éléments de CapteurRepository & de JobDating donc on 
+// ramène les datas nécessaires & CO2, on ramène également celle de 
 // SalleMockJournalier car désormais utilisable
+import esiag.back.services.jobdating.JobDatingRoomService;
 import esiag.back.models.capteur.Capteur;
 import esiag.back.repositories.capteur.CapteurRepository;
 import esiag.back.repositories.salle.SalleMockJournalierRepository;
@@ -27,12 +28,14 @@ public class SalleScoreService {
     private final SalleService salleService;
     private final CapteurRepository capteurRepository;
     private final SalleMockJournalierRepository mockRepository;
+    private final JobDatingRoomService jobDatingRoomService;
 
     public SalleScoreService(SalleService salleService, CapteurRepository capteurRepository,
-            SalleMockJournalierRepository mockRepository) {
+            SalleMockJournalierRepository mockRepository, JobDatingRoomService jobDatingRoomService) {
         this.salleService = salleService;
         this.capteurRepository = capteurRepository;
         this.mockRepository = mockRepository;
+        this.jobDatingRoomService = jobDatingRoomService;
     }
 
     public SalleScoreResult calculateScore(Long idSalle) {
@@ -40,7 +43,7 @@ public class SalleScoreService {
         LocalDate localDate = LocalDate.now();
         if (salle == null)
             // il faut adopter à 6 éléments désormais
-            return new SalleScoreResult(0.0, 0.0, Map.of(), Map.of(), 0.0, 0.0, 0.0, 0.0);
+            return new SalleScoreResult(0.0, 0.0, Map.of(), Map.of(), 0.0, 0.0, 0.0, 0.0, 0);
 
         Capteur capteurTemp = capteurRepository
                 .findTopByIdSalleAndTypeOrderByDateMesureDesc(idSalle, "TEMPERATURE");
@@ -147,6 +150,11 @@ public class SalleScoreService {
         details.put("contribOrient", contribOrient);
         details.put("contribChauffage", contribChauffage);
 
+        // Calcul du Co2 d'après JobDating
+        int nbPersonnes = salle.getCapacite();
+        int scoreCo2 = jobDatingRoomService.getScoreCO2(salle, nbPersonnes);
+        scoreCo2 = scoreCo2 * 5 / 3; // sert à adapter le score CO2 de Mohamed qui est initialement sur 60 à 100
+
         // SCORE CONFORT
         Map<String, Double> detailsConfort = new HashMap<>();
         double scoreConfort = calculateScoreConfort(salle, detailsConfort);
@@ -159,7 +167,8 @@ public class SalleScoreService {
                 salle.getTemperature(),
                 salle.getHumidite(),
                 coefMeteo,
-                coefVacances);
+                coefVacances,
+                scoreCo2);
     }
 
     // On calcule le score de confort avec une méthode de calcul primaire car moins

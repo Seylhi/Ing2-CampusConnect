@@ -23,10 +23,12 @@ public class SalleScoreResult {
     // provenant du mock de la table salle_mock_journalier via result dans Service
     private double coefMeteo;
     private double coefVacances;
+    // afin d'utiliser le score de CO2 dans mon score global
+    private int scoreCo2;
 
     public SalleScoreResult(double scoreEnergie, double scoreConfort,
             Map<String, Double> detailsEnergie, Map<String, Double> detailsConfort, double temperature,
-            double humidite, double coefMeteo, double coefVacances) {
+            double humidite, double coefMeteo, double coefVacances, int scoreCo2) {
 
         this.scoreEnergie = scoreEnergie;
         this.scoreConfort = scoreConfort;
@@ -37,6 +39,7 @@ public class SalleScoreResult {
         this.humidite = humidite;
         this.coefMeteo = coefMeteo;
         this.coefVacances = coefVacances;
+        this.scoreCo2 = scoreCo2;
     }
 
     public double getScoreEnergie() {
@@ -73,6 +76,10 @@ public class SalleScoreResult {
 
     public double getCoefVacances() {
         return coefVacances;
+    }
+
+    public int getScoreCO2() {
+        return scoreCo2;
     }
 
 }

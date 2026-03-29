@@ -115,6 +115,7 @@ export default function Salle() {
               <th>Humidité</th>
               <th>Score énergétique</th>
               <th>Score confort</th>
+              <th>Score CO²</th>
             </tr>
           </thead>
 
@@ -254,6 +255,10 @@ Calcul effectué le : ${result.calculationTime
                     )}
                   </td>
 
+                  <td>
+                    {result?.scoreCO2 != null ? `${result.scoreCO2} / 100` : "N/A"}
+                  </td>
+
                 </tr>
               );
             })}
@@ -307,6 +312,7 @@ Calcul effectué le : ${result.calculationTime
                   <th>Salle</th>
                   <th>Score énergétique</th>
                   <th>Score confort</th>
+                  <th>Score CO²</th>
                   <th>Score global</th>
                 </tr>
               </thead>
@@ -316,8 +322,8 @@ Calcul effectué le : ${result.calculationTime
                   .sort((a, b) => {
                     // basée sur une méthode Array que j'ai trouvé sur un forum qui permet d'étudier deux éléments qui 
                     // se suivent dans une liste. Si la soustraction de A et B est positive alors, décroissant !
-                    const A = (scoreResults[a.idSalle]?.scoreEnergie) + (scoreResults[a.idSalle]?.scoreConfort);
-                    const B = (scoreResults[b.idSalle]?.scoreEnergie) + (scoreResults[b.idSalle]?.scoreConfort);
+                    const A = (scoreResults[a.idSalle]?.scoreEnergie) + (scoreResults[a.idSalle]?.scoreConfort) + (scoreResults[a.idSalle]?.scoreCO2);
+                    const B = (scoreResults[b.idSalle]?.scoreEnergie) + (scoreResults[b.idSalle]?.scoreConfort) + (scoreResults[b.idSalle]?.scoreCO2);
                     return B - A;
                   })
 
@@ -325,7 +331,8 @@ Calcul effectué le : ${result.calculationTime
                     const result = scoreResults[salle.idSalle];
                     const energyScore = result?.scoreEnergie;
                     const confortScore = result?.scoreConfort;
-                    const globalScore = (result.scoreEnergie + result.scoreConfort) / 2;
+                    const CO2Score = result?.scoreCO2;
+                    const globalScore = (result.scoreEnergie + result.scoreConfort + result.scoreCO2) / 3;
                     const energyLetter = getEnergyLetter(energyScore);
                     const confortLetter = getComfortLetter(confortScore);
                     const globalLetter = getGlobalLetter(globalScore);
@@ -333,9 +340,12 @@ Calcul effectué le : ${result.calculationTime
                     return (
                       <tr key={salle.idSalle}>
                         <td>{salle.nomSalle}</td>
-                        <td>{energyScore ? `${energyScore.toFixed(0)} (${energyLetter})` : "N/A"}</td>
-                        <td>{confortScore ? `${confortScore.toFixed(0)} (${confortLetter})` : "N/A"}</td>
-                        <td>{globalScore ? `${globalScore.toFixed(0)} (${globalLetter})` : "N/A"}</td>
+                        {/* Le != permet de dire que cette valeur ne peut etre nulle ou non defini et force 
+                        donc l'affichage, même du 0*/}
+                        <td>{energyScore != null ? `${energyScore.toFixed(0)} (${energyLetter})` : "N/A"}</td>
+                        <td>{confortScore != null ? `${confortScore.toFixed(0)} (${confortLetter})` : "N/A"}</td>
+                        <td>{CO2Score != null ? `${CO2Score.toFixed(0)} / 100` : "N/A"}</td>
+                        <td>{globalScore != null ? `${globalScore.toFixed(0)} (${globalLetter})` : "N/A"}</td>
                       </tr>
                     );
                   })}

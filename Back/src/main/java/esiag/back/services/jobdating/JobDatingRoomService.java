@@ -13,7 +13,7 @@ public class JobDatingRoomService {
 
     @Autowired
     private SalleRepository salleRepository;
-    
+
     @Autowired
     private CapteurRepository capteurRepository;
 
@@ -54,34 +54,37 @@ public class JobDatingRoomService {
                 } else if (salleActuelle.getHumidite() != null) {
                     humidite = salleActuelle.getHumidite();
                 }
-                
+
                 // calcul du score de température sur 20 pts
                 int scoreTemperature = 0;
                 if (temperature >= 20 && temperature <= 23) {
-                    scoreTemperature = 20; 
-                } else if ((temperature >= 18 && temperature < 20) || (temperature > 23 && temperature <= 26)) {                    scoreTemperature = 10; 
+                    scoreTemperature = 20;
+                } else if ((temperature >= 18 && temperature < 20) || (temperature > 23 && temperature <= 26)) {
+                    scoreTemperature = 10;
                 } else {
-                    scoreTemperature = 0;  
+                    scoreTemperature = 0;
                 }
 
                 // calcul du score d'humidité sur 20 pts
                 int scoreHumidite = 0;
                 if (humidite >= 40 && humidite <= 60) {
-                    scoreHumidite = 20; 
+                    scoreHumidite = 20;
                 } else if ((humidite >= 30 && humidite < 40) && (humidite > 60 && humidite <= 70)) {
-                    scoreHumidite = 10; 
+                    scoreHumidite = 10;
                 } else {
-                    scoreHumidite = 0;  
+                    scoreHumidite = 0;
                 }
 
-                //calcul du score de CO2 sur 60 pts
+                // calcul du score de CO2 sur 60 pts
 
-                // j'ai supposé une norme de 3m de hauteur, mes camarades ont déjà la surface des salles
+                // j'ai supposé une norme de 3m de hauteur, mes camarades ont déjà la surface
+                // des salles
                 // calcul du volume de la salle
                 double volume = salleActuelle.getSurfaceM2() * 3.0;
 
                 // ACH pour Air changes per hour
-                // ça correspond au nombre de fois où l'air est renouvelé dans une pièce pendant une période d'une heure
+                // ça correspond au nombre de fois où l'air est renouvelé dans une pièce pendant
+                // une période d'une heure
                 // je prends une moyenne de 3 qui correspond à ce qu'on trouve dans une salle
                 double ACH = 3.0;
 
@@ -114,7 +117,7 @@ public class JobDatingRoomService {
                 } else {
                     scoreCo2 = 0;
                 }
-                
+
                 // calcul du score total sur 100 pts
                 int scoreTotal = scoreCo2 + scoreTemperature + scoreHumidite;
 
@@ -131,14 +134,32 @@ public class JobDatingRoomService {
 
         String status;
         if (meilleureSalle == null) {
-             status = "Capacité de salle insuffisante";
-            } else if (meilleurScoreFinal >= 80) {
-                status = "Salle idéale";
-            } else if (meilleurScoreFinal >= 50) {
-                status = "Salle moyenne";
-            } else {
-                status = "Salle à éviter";
-            }
-            
-        return new JobDatingRoomResultat(meilleureSalle, meilleurScoreFinal, status, meilleurCo2, meilleurScoreTemp, meilleurScoreHum, meilleurScoreCo2);    }
+            status = "Capacité de salle insuffisante";
+        } else if (meilleurScoreFinal >= 80) {
+            status = "Salle idéale";
+        } else if (meilleurScoreFinal >= 50) {
+            status = "Salle moyenne";
+        } else {
+            status = "Salle à éviter";
+        }
+
+        return new JobDatingRoomResultat(meilleureSalle, meilleurScoreFinal, status, meilleurCo2, meilleurScoreTemp,
+                meilleurScoreHum, meilleurScoreCo2);
+    }
+
+    // Duplication de la logique de calcul pour l'adapter aux salles afin de
+    // compléter mon calcul de score global
+    public int getScoreCO2(Salle salle, int nbPersonnes) {
+        double volume = salle.getSurfaceM2() * 3.0;
+        double ACH = 3.0;
+        double co2Estime = 400 + (nbPersonnes * 0.018 * 1000000) / (ACH * volume);
+        if (co2Estime < 800)
+            return 60;
+        else if (co2Estime < 1000)
+            return 40;
+        else if (co2Estime < 1500)
+            return 15;
+        else
+            return 0;
+    }
 }
