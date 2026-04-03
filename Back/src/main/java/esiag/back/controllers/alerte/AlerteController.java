@@ -28,4 +28,9 @@ public class AlerteController {
     public void resolveAlerte(@PathVariable Long id) {
         alerteService.resolveAlerte(id);
     }
+
+    @GetMapping("/capteur/{idCapteur}/pannes")
+public List<Alerte> getPannes(@PathVariable Long idCapteur) {
+    return alerteService.getAlertesPanne(idCapteur);
+}
 }
