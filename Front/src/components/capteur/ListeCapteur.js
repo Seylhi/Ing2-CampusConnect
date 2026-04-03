@@ -64,7 +64,7 @@ if (temperatureSousSeuil) {
       <td>{capteur.idSalle}</td>
       <td>{capteur.humidite}</td>
       <td style={styleTemperature}>{capteur.temperature}</td>
-      <td>{capteur.presence ? "Oui" : "Non"}</td>
+      <td>{capteur.presence}</td>
       <td>{capteur.dateMesure?.substring(0, 10)}</td>
       <td>{capteur.fenetreOuverte ? "Oui" : "Non"}</td>
       <td>{capteur.porteOuverte ? "Oui" : "Non"}</td>
