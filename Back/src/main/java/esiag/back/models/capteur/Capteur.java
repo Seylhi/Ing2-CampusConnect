@@ -18,7 +18,7 @@ public class Capteur {
 
     private Double temperature;
     private Double humidite;
-    private Boolean presence;
+    private Integer presence;
 
     @Column(name = "date_mesure")
     private LocalDateTime dateMesure;
