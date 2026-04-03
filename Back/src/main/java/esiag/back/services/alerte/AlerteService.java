@@ -22,6 +22,10 @@ public class AlerteService {
         return alerteRepository.findByIdCapteurAndActiveTrue(idCapteur);
     }
 
+    public List<Alerte> getAlertesPanne(Long idCapteur) {
+    return alerteRepository.findByIdCapteurAndTypeAndActiveTrue(idCapteur, "PANNE"); //rappel "PANNE" par rapport au trigger mis dans la bdd
+}
+
     public void resolveAlerte(Long id) {
         alerteRepository.findById(id).ifPresent(alerte -> {
             alerte.setActive(false);
