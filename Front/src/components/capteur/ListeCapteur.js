@@ -4,6 +4,10 @@ export default function ListeCapteur({ capteur, resultat, onSupprimer, onAffiche
 
   const seuil_temperature = 19;
   const temperatureSousSeuil = capteur.temperature !== null && capteur.temperature < seuil_temperature;
+  const capteurDefaillant = 
+  (capteur.temperature !== null && (capteur.temperature > 28 || capteur.temperature < 19))
+  || (capteur.humidite !== null && (capteur.humidite > 80 || capteur.humidite < 10))
+  || (capteur.presence !== null && capteur.presence > 80);
 
   let styleTemperature = { color: "black", fontWeight: "normal" };
 
@@ -64,7 +68,7 @@ if (temperatureSousSeuil) {
       <td>{capteur.idSalle}</td>
       <td>{capteur.humidite}</td>
       <td style={styleTemperature}>{capteur.temperature}</td>
-      <td>{capteur.presence ? "Oui" : "Non"}</td>
+      <td>{capteur.presence}</td>
       <td>{capteur.dateMesure?.substring(0, 10)}</td>
       <td>{capteur.fenetreOuverte ? "Oui" : "Non"}</td>
       <td>{capteur.porteOuverte ? "Oui" : "Non"}</td>
@@ -106,6 +110,9 @@ if (temperatureSousSeuil) {
     Activer chauffage
   </button>
 )}
+{capteurDefaillant && <b 
+style={{ color: "red" }}>Capteur détectant une donnée anormal</b>
+}
       </td>
     </tr>
   );

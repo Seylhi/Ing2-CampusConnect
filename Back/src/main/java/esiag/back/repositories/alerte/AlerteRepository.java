@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface AlerteRepository extends JpaRepository<Alerte, Long> {
     List<Alerte> findByIdCapteurAndActiveTrue(Long idCapteur);
+
+    List<Alerte> findByIdCapteurAndTypeAndActiveTrue(Long idCapteur, String type);
 }
