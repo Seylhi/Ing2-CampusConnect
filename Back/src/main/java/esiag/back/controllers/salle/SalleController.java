@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("salle")
 
 // Dans notre cas, on va se concentrer uniquement sur l'affichage car les
-// données des salle sne sont pas vouées à changer
+// données des salles ne sont pas vouées à changer
 // du moins pas encore !
 public class SalleController {
 
@@ -66,5 +66,11 @@ public class SalleController {
         }
 
         return new ResponseEntity<>(calcSalles, HttpStatus.OK);
+    }
+
+    // Simplement pour afficher les logs des calcul
+    @GetMapping("/logs")
+    public ResponseEntity<List<String>> getLogs() {
+        return ResponseEntity.ok(salleScoreService.getLogs());
     }
 }

@@ -10,6 +10,9 @@ export default function Salle() {
   const [nbPersonnes, setNbPersonnes] = useState();
   const [tp, setTp] = useState(false);
   const [calculResults, setCalculResults] = useState([]);
+  // Constantes pour la fenetre de log au lieu de faire des alertes
+  const [logWindow, setLogWindow] = useState(null);
+
 
   // Charger les salles
   const loadSalles = async () => {
@@ -48,6 +51,24 @@ export default function Salle() {
   useEffect(() => {
     loadSalles();
   }, []);
+
+  // On cree notre fenetre qui acceuillera nos logs
+  useEffect(() => {
+    if (!logWindow) return;
+    const interval = setInterval(() => {
+      axios.get(`${LOCAL_HOST_SALLE}logs`).then((res) => {
+        if (!logWindow.closed) {
+          logWindow.document.body.innerHTML = res.data.join("<br/>");
+        }
+      });
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [logWindow]);
+
+  const ouvrirLogs = () => {
+    const win = window.open("", "logsWindow", "width=700,height=500");
+    setLogWindow(win);
+  };
 
   if (salles.length === 0)    // au début, j'ai essayé avec isEmpty() mais non gérer dans JS
     return <div className="container text-center">No salles</div>;
@@ -150,109 +171,15 @@ export default function Salle() {
                       ? `${result.scoreEnergie.toFixed(0)} (${energyLetter})`
                       : "Chargement..."}
 
-                    {result && (
-                      <button
-                        className="btn btn-sm btn-warning ms-2" // permet de mettre le bouton en jaune
-                        onClick={() => {
-                          alert(
-                            `Score énergétique : ${result.scoreEnergie != null ? result.scoreEnergie.toFixed(0) : "N/A"} / 100 (${energyLetter})
-Interprétation : ${result.scoreEnergie != null
-                              ? result.scoreEnergie >= 75
-                                ? "Salle très économe en énergie"
-                                : result.scoreEnergie >= 50
-                                  ? "Consommation modérée"
-                                  : result.scoreEnergie >= 25
-                                    ? "Salle énergivore"
-                                    : "Salle très énergivore"
-                              : "N/A"
-                            }
+                    {/* Retrait des alerts et des boutons afin de, clarifier notre tableau qui était tout plein de boutons, et également mettre tous les logs dans une nouvelle fenetre 
+                    --> demandé par M. Brenner*/}
 
-Données brutes
-Surface : ${dE.surface != null ? dE.surface : "N/A"} m²
-Fenêtres : ${dE.fenetres != null ? dE.fenetres : "N/A"}
-Orientation (coef) : ${dE.orientationCoef != null ? dE.orientationCoef : "N/A"}
-Chauffage : ${dE.chauffage === 1 ? "Oui" : dE.chauffage === 0 ? "Non" : "N/A"}
-Coefficient météo : ${result.coefMeteo ?? "N/A"}
-
-Normalisation & Pondération
-Surface normalisée : ${dE.surfaceNorm != null ? dE.surfaceNorm.toFixed(2) : "N/A"}
-Fenêtres normalisées : ${dE.fenetresNorm != null ? dE.fenetresNorm.toFixed(2) : "N/A"}
-Contribution Surface : (1 - SurfaceNorm (${dE.surfaceNorm.toFixed(2)})) × 0.30 = ${dE.contribSurface != null ? dE.contribSurface.toFixed(2) : "N/A"}
-Contribution Fenêtres : FenêtresNorm (${dE.fenetresNorm.toFixed(2)}) × 0.25 × CoefMétéo = ${dE.contribFen != null ? dE.contribFen.toFixed(2) : "N/A"}
-Contribution Orientation : OrientationCoef (${dE.orientationCoef.toFixed(2)}) × 0.20 × CoefMétéo (${result.coefMeteo.toFixed(2)})= ${dE.contribOrient != null ? dE.contribOrient.toFixed(2) : "N/A"}
-Contribution Chauffage : (1 - Chauffage (${dE.chauffage.toFixed(2)})) × 0.25 × CoefTemp = ${dE.contribChauffage != null ? dE.contribChauffage.toFixed(2) : "N/A"}
-
-Formule finale :
-Score final après vacances = Score énergétique brut (${result.scoreEnergie.toFixed(2)}) × CoefVacances (${result.coefVacances.toFixed(2)})
-
-Calcul effectué le : ${result.calculationTime
-                              ? new Date(
-                                result.calculationTime,
-                              ).toLocaleString()
-                              : "N/A"
-                            }`,
-                          );
-                        }}
-                      // Ci-dessus, on a détaillé rapidement le calcul en affichant une alerte
-                      >
-                        Détails
-                      </button>
-                    )}
                   </td>
 
                   <td>
                     {result?.scoreConfort != null
                       ? `${result.scoreConfort.toFixed(0)} (${confortLetter})`
                       : "Chargement..."}
-
-                    {result && (
-                      <button
-                        className="btn btn-sm btn-warning ms-2" // permet de mettre le bouton en jaune
-                        onClick={() => {
-                          alert(
-                            `Score confort : ${result.scoreConfort.toFixed(0)} / 100
-Interprétation : ${result.scoreConfort != null
-                              ? result.scoreConfort >= 75
-                                ? "Salle très confortable"
-                                : result.scoreConfort >= 50
-                                  ? "Salle assez confortable"
-                                  : result.scoreConfort >= 25
-                                    ? "Salle peu confortable"
-                                    : "Salle non confortable"
-                              : "N/A"
-                            }
-
-Données brutes
-Température : ${result.temperature ?? "N/A"} °C
-Humidité : ${result.humidite ?? "N/A"} %
-Capacité : ${salle.capacite ?? "N/A"} personnes
-Surface : ${salle.surfaceM2 ?? "N/A"} m²
-Fenêtres : ${salle.nbFenetres ?? "N/A"}
-Orientation : ${salle.orientation ?? "N/A"}
-Type salle TP : ${salle.estSalleTp ? "Oui" : "Non"}
-
-Pondération
-Température = ${dC.scoreTemperature ?? "N/A"} / 30
-Humidité = ${dC.scoreHumidite ?? "N/A"} / 20
-Densité = ${dC.scoreDensite ?? "N/A"} / 20
-Luminosité = ${dC.scoreLuminosite ?? "N/A"} / 15
-Type salle = ${dC.scoreTypeSalle ?? "N/A"} / 15
-
-Formule finale :
-Score confort = Somme des contributions
-
-Calcul effectué le : ${result.calculationTime
-                              ? new Date(
-                                result.calculationTime,
-                              ).toLocaleString()
-                              : "N/A"
-                            }`,
-                          );
-                        }}
-                      >
-                        Détails
-                      </button>
-                    )}
                   </td>
 
                   <td>
@@ -264,6 +191,12 @@ Calcul effectué le : ${result.calculationTime
             })}
           </tbody>
         </table>
+
+        <div className="mb-5">
+          <button className="btn btn-warning" onClick={ouvrirLogs}>
+            Voir les détails de calcul
+          </button>
+        </div>
 
         <div className="mb-3">
           <h5>Calcul de salle - en fonction de l'occupation prévue</h5>
@@ -310,6 +243,8 @@ Calcul effectué le : ${result.calculationTime
               <thead>
                 <tr>
                   <th>Salle</th>
+                  <th>Capacité</th>
+                  <th>TD</th>
                   <th>Score énergétique</th>
                   <th>Score confort</th>
                   <th>Score CO²</th>
@@ -340,6 +275,8 @@ Calcul effectué le : ${result.calculationTime
                     return (
                       <tr key={salle.idSalle}>
                         <td>{salle.nomSalle}</td>
+                        <td>{salle.capacite} personnes</td>
+                        <td>{salle.estSalleTp ? "Oui" : "Non"}</td>
                         {/* Le != permet de dire que cette valeur ne peut etre nulle ou non defini et force 
                         donc l'affichage, même du 0*/}
                         <td>{energyScore != null ? `${energyScore.toFixed(0)} (${energyLetter})` : "N/A"}</td>
