@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function ListeCapteur({ capteur, resultat, onSupprimer, onAfficherAlertes, onActiverChauffage }) {
+export default function ListeCapteur({ capteur, resultat, onSupprimer, onAfficherAlertes, onActiverChauffage, onAfficherHistorique }) {
 
   const seuil_temperature = 19;
   const temperatureSousSeuil = capteur.temperature !== null && capteur.temperature < seuil_temperature;
@@ -102,6 +102,9 @@ if (temperatureSousSeuil) {
         </button>
         <button className="btn btn-sm btn-outline-warning" onClick={() => onAfficherAlertes(capteur.id)}>
           Alertes
+        </button>
+        <button className="btn btn-sm btn-outline-secondary me-2" onClick={() => onAfficherHistorique(capteur)}>
+          Historique
         </button>
 
       {temperatureSousSeuil && !capteur.chauffageOn && (
