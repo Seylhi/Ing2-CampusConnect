@@ -8,6 +8,7 @@ import ListeCapteur from "./ListeCapteur";
 import ScoreDetails from "./ScoreDetails";
 import Alertes from "./Alertes";
 import Monitoring from "./Monitoring";
+import Historique from "./Historique";
 
 export default function Capteur() {
 
@@ -16,6 +17,7 @@ export default function Capteur() {
   const [capteurSelectionne, setCapteurSelectionne] = useState(null);
   const [scoreSelectionne, setScoreSelectionne] = useState(null);
   const [donneesAlertes, setDonneesAlertes] = useState([]);
+  const [capteurHistorique, setCapteurHistorique] = useState(null);
 
  const activerChauffage = async (idSalle) => {
   try {
@@ -142,6 +144,7 @@ export default function Capteur() {
                     setScoreSelectionne(r);
                   }}
                   onAfficherAlertes={chargerAlertes}
+                  onAfficherHistorique={(c) => setCapteurHistorique(c)}
                 />
               ))}
             </React.Fragment>
@@ -158,6 +161,10 @@ export default function Capteur() {
       <Alertes
         alertes={donneesAlertes}
         fermer={() => setDonneesAlertes([])}
+      />
+      <Historique
+        capteur={capteurHistorique}
+        fermer={() => setCapteurHistorique(null)}
       />
     </div>
   );

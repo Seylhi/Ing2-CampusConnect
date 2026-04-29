@@ -1,12 +1,16 @@
 package esiag.back.controllers.capteur;
 
 import esiag.back.models.capteur.Capteur;
+import esiag.back.models.MesureCapteur.CapteurMesure;
+import esiag.back.models.MesureCapteur.CapteurMesure.TypeMesure;
+import esiag.back.repositories.MesureCapteur.CapteurMesureRepository;
 import esiag.back.services.capteur.CapteurService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -15,6 +19,8 @@ public class CapteurController {
 
     @Autowired
     private CapteurService capteurService;
+    @Autowired
+    private CapteurMesureRepository capteurMesureRepository;
 
     @GetMapping("/{id}")
     public ResponseEntity<Capteur> findById(@PathVariable Long id){
@@ -70,7 +76,17 @@ public class CapteurController {
         c.setChauffageOn(true);
         capteurService.save(c);
     }
-
     return new ResponseEntity<>(HttpStatus.OK);
 }
+
+   @GetMapping("/{id}/historique")
+    public ResponseEntity<List<CapteurMesure>> getHistorique(@PathVariable Long id) {
+        List<CapteurMesure> mesures = capteurMesureRepository.findByCapteurIdAndTypeAndDateMesureAfter(
+            id,
+            TypeMesure.TEMPERATURE,
+            LocalDateTime.now().minusHours(24)
+        );
+        return new ResponseEntity<>(mesures, HttpStatus.OK);
+    }
+
 }
