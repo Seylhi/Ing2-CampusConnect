@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,5 +73,14 @@ public class SalleController {
     @GetMapping("/logs")
     public ResponseEntity<List<String>> getLogs() {
         return ResponseEntity.ok(salleScoreService.getLogs());
+    }
+
+    // Simplement pour afficher la partie simulation
+    @GetMapping("/{id}/score/simulation")
+    public ResponseEntity<SalleScoreResult> getScoreSimulation(
+            @PathVariable Long id,
+            @RequestParam String dateTime) {
+        LocalDateTime dt = LocalDateTime.parse(dateTime);
+        return new ResponseEntity<>(salleScoreService.calculateScoreAt(id, dt), HttpStatus.OK);
     }
 }
