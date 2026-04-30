@@ -7,8 +7,6 @@ package esiag.back.services.salle;
 // ramène les datas nécessaires & CO2, on ramène également celle de 
 // SalleMockJournalier car désormais utilisable
 import esiag.back.services.jobdating.JobDatingRoomService;
-import esiag.back.models.capteur.Capteur;
-import esiag.back.repositories.capteur.CapteurRepository;
 import esiag.back.repositories.salle.SalleMockJournalierRepository;
 import esiag.back.models.salle.Salle;
 import esiag.back.models.salle.SalleMockJournalier;
@@ -19,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.time.LocalDate; // utile pour notre mock journalier
+import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Service
@@ -27,14 +27,12 @@ public class SalleScoreService {
     // initialisation de CapteurRepository et de SalleMockJournalier sur l'exemple
     // de SalleService
     private final SalleService salleService;
-    private final CapteurRepository capteurRepository;
     private final SalleMockJournalierRepository mockRepository;
     private final JobDatingRoomService jobDatingRoomService;
 
-    public SalleScoreService(SalleService salleService, CapteurRepository capteurRepository,
-            SalleMockJournalierRepository mockRepository, JobDatingRoomService jobDatingRoomService) {
+    public SalleScoreService(SalleService salleService, SalleMockJournalierRepository mockRepository,
+            JobDatingRoomService jobDatingRoomService) {
         this.salleService = salleService;
-        this.capteurRepository = capteurRepository;
         this.mockRepository = mockRepository;
         this.jobDatingRoomService = jobDatingRoomService;
     }
@@ -45,51 +43,69 @@ public class SalleScoreService {
         log("Salle ID : " + idSalle);
         Salle salle = salleService.findByIdSalle(idSalle);
         LocalDate localDate = LocalDate.now();
+        String periode = PeriodeUtils.getPeriode(LocalTime.now());
+
         if (salle == null)
-            // il faut adopter à 6 éléments désormais
             return new SalleScoreResult(0.0, 0.0, Map.of(), Map.of(), 0.0, 0.0, 0.0, 0.0, 0);
+
         log("Salle trouvée : " + salle.getNomSalle());
         log("Capacité salle : " + salle.getCapacite());
         log("Surface salle : " + salle.getSurfaceM2());
         log("Nb fenêtres : " + salle.getNbFenetres());
-        Capteur capteurTemp = capteurRepository
-                .findTopByIdSalleAndTypeOrderByDateMesureDesc(idSalle, "TEMPERATURE");
-
-        Capteur capteurHum = capteurRepository
-                .findTopByIdSalleAndTypeOrderByDateMesureDesc(idSalle, "HUMIDITE");
 
         SalleMockJournalier mockJournalier = mockRepository
-                .findByIdSalleAndDateJour(salle.getIdSalle(), localDate);
+                .findByIdSalleAndDateJourAndPeriode(salle.getIdSalle(), localDate, periode);
 
-        // C'est ici que l'on déclare nos variables provenant de capteurs afin de
-        // garder la même forme mais avec des données liées à celle de Capteur
-        if (capteurTemp != null) {
-            salle.setTemperature(capteurTemp.getTemperature());
-            log("Température capteur : " + capteurTemp.getTemperature());
+        if (mockJournalier != null) {
+            salle.setTemperature(mockJournalier.getTemperature());
+            salle.setHumidite(mockJournalier.getHumidite());
+            log("Température mock : " + mockJournalier.getTemperature());
+            log("Humidité mock : " + mockJournalier.getHumidite());
         }
 
-        if (capteurHum != null) {
-            salle.setHumidite(capteurHum.getHumidite());
-            log("Humidité capteur : " + capteurHum.getHumidite());
+        return computeScore(salle, mockJournalier);
+    }
+
+    // Même principe que calculatescore mais prend une date/heure en paramètre
+    // au lieu de l'heure actuelle, afin de pouvoir simuler les scores en focntion
+    // des parametres en allant chercher les données du mock correspondantes
+    public SalleScoreResult calculateScoreAt(Long idSalle, LocalDateTime dateTime) {
+        log("");
+        log("SIMULATION - DONNEES DE LA SALLE");
+        log("Salle ID : " + idSalle);
+        Salle salle = salleService.findByIdSalle(idSalle);
+        LocalDate localDate = dateTime.toLocalDate();
+        String periode = PeriodeUtils.getPeriode(dateTime.toLocalTime());
+
+        if (salle == null)
+            return new SalleScoreResult(0.0, 0.0, Map.of(), Map.of(), 0.0, 0.0, 0.0, 0.0, 0);
+
+        SalleMockJournalier mockJournalier = mockRepository
+                .findByIdSalleAndDateJourAndPeriode(salle.getIdSalle(), localDate, periode);
+
+        if (mockJournalier != null) {
+            salle.setTemperature(mockJournalier.getTemperature());
+            salle.setHumidite(mockJournalier.getHumidite());
         }
 
-        // SCORE ENERGIE
-        // Récupération de toutes les salles pour min/max (utile pour avoir une vue
-        // d'ensemble et surtout pour la suite des calculs)
+        // on ne s'embête pas car computeScore est partagée par les différentes méthodes
+        return computeScore(salle, mockJournalier);
+    }
+
+    private SalleScoreResult computeScore(Salle salle, SalleMockJournalier mockJournalier) {
+        if (mockJournalier == null)
+            return new SalleScoreResult(0.0, 0.0, Map.of(), Map.of(), 0.0, 0.0, 0.0, 0.0, 0);
+
         List<Salle> all = salleService.findAllSalles();
         double minSurface = all.stream().mapToDouble(Salle::getSurfaceM2).min().orElse(0);
         double maxSurface = all.stream().mapToDouble(Salle::getSurfaceM2).max().orElse(1);
         int minFen = all.stream().mapToInt(Salle::getNbFenetres).min().orElse(0);
         int maxFen = all.stream().mapToInt(Salle::getNbFenetres).max().orElse(1);
 
-        // Données provenant de notre mock pour venir préciser notre calcul de score
-        // énergétique, on fait exprès de ne pas gérer le null car table jamais vide,
-        // même si il est vrai qu'il serait plus propre de le faire
         double coefMeteo = mockJournalier.getCoefficientMeteo();
         double coefVacances = mockJournalier.getCoefficientVacances();
         double temperatureExt = mockJournalier.getTemperatureExterieure();
 
-        // Normalisation des données
         double surfaceNorm = (maxSurface - minSurface != 0)
                 ? (salle.getSurfaceM2() - minSurface) / (maxSurface - minSurface)
                 : 0;
@@ -113,14 +129,12 @@ public class SalleScoreService {
         log("Fenêtres normalisées : " + fenNorm);
         log("Orientation coef : " + orientCoef);
         log("Chauffage : " + chauffageVal);
-
         // Calcul avec les coefficients (ils sont choisis en fonction de l'importance du
         // caractère)
         double contribSurface = (1 - surfaceNorm) * 0.30;
         double contribFen = fenNorm * 0.25;
         double contribOrient = orientCoef * 0.20;
         double contribChauffage = (1 - chauffageVal) * 0.25;
-
         // Impact de la température sur le chauffage, difficulté à chauffer correctement
         // quand il fait plus froid
         double coefTemp;
@@ -188,7 +202,7 @@ public class SalleScoreService {
 
         // Calcul du Co2 d'après JobDating
         int nbPersonnes = salle.getCapacite();
-        int scoreCo2 = jobDatingRoomService.getScoreCO2(salle, nbPersonnes, 12); //heure moyenne de la journée pour le jobdating
+        int scoreCo2 = jobDatingRoomService.getScoreCO2(salle, nbPersonnes, 12)* 5/3; //heure moyenne de la journée pour le jobdating
         scoreCo2 = scoreCo2 * 2; // sert à adapter le score CO2 de Mohamed qui est initialement sur 60 à 100 -- je pars sur un score CO2 de 50
 
         log("");
@@ -203,14 +217,14 @@ public class SalleScoreService {
         log("");
 
         return new SalleScoreResult(
-                score,
-                scoreConfort,
-                details,
+                score, 
+                scoreConfort, 
+                details, 
                 detailsConfort,
-                salle.getTemperature(),
+                salle.getTemperature(), 
                 salle.getHumidite(),
-                coefMeteo,
-                coefVacances,
+                coefMeteo, 
+                coefVacances, 
                 scoreCo2);
     }
 

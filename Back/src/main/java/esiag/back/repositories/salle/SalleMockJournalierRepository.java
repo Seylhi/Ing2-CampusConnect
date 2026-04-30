@@ -8,5 +8,5 @@ import java.time.LocalDate;
 // même schéma que pour les repository précédents, simplement ici, on récupère la data par date et par id
 @Repository
 public interface SalleMockJournalierRepository extends JpaRepository<SalleMockJournalier, Long> {
-    SalleMockJournalier findByIdSalleAndDateJour(Long idSalle, LocalDate dateJour);
+    SalleMockJournalier findByIdSalleAndDateJourAndPeriode(Long idSalle, LocalDate dateJour, String periode);
 }
