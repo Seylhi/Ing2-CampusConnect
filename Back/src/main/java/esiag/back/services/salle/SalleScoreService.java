@@ -188,13 +188,13 @@ public class SalleScoreService {
 
         // Calcul du Co2 d'après JobDating
         int nbPersonnes = salle.getCapacite();
-        int scoreCo2 = jobDatingRoomService.getScoreCO2(salle, nbPersonnes);
-        scoreCo2 = scoreCo2 * 5 / 3; // sert à adapter le score CO2 de Mohamed qui est initialement sur 60 à 100
+        int scoreCo2 = jobDatingRoomService.getScoreCO2(salle, nbPersonnes, 12); //heure moyenne de la journée pour le jobdating
+        scoreCo2 = scoreCo2 * 2; // sert à adapter le score CO2 de Mohamed qui est initialement sur 60 à 100 -- je pars sur un score CO2 de 50
 
         log("");
         log("DONNEES & CALCULS LIEES AU CO2");
         log("Nombre de personnes : " + nbPersonnes);
-        log("Score CO2 (avant adaptation) : " + jobDatingRoomService.getScoreCO2(salle, nbPersonnes));
+        log("Score CO2 (avant adaptation) : " + jobDatingRoomService.getScoreCO2(salle, nbPersonnes, 12)); 
         log("Score CO2 final : " + scoreCo2);
 
         // SCORE CONFORT
