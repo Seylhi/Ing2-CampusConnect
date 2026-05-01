@@ -43,4 +43,13 @@ public class SalleMockJournalier {
 
     @Column(name = "coefficient_vacances")
     private double coefficientVacances;
+
+    @Column(name = "periode")
+    private String periode;
+
+    @Column(name = "temperature")
+    private Double temperature;
+
+    @Column(name = "humidite")
+    private Double humidite;
 }

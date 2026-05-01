@@ -6,18 +6,14 @@ KHEDIM Mohammed
 REDJECHTA Abderraouf
 CORCHER Ethan
 
-# User Stories (liés à la Release 2)
+# User Stories (liés à la Release 3)
 
 CORCHER Ethan -
-US1 - S’informer sur les différentes technologies utilisées (Spring, React, Vite)
-US2 - Remplir le formulaire d'attribution des salles
-US3 - Visualiser les données utiles au calcul de confort (température, confort)
-US4 - Calculer un score de confort
-US5 - Lier le calcul de confort à la base de données PSQL (issues de la table capteur)
-US6 - Rendre le score explicable (détail énergie / confort / capacité)
-US7 - Recalculer automatiquement les scores lors d’une mise à jour d’un paramètre
-US8 - Définir les critères d’attribution d’une salle
-US9 - Implémenter la sélection automatique de la meilleure salle
+US1 - Ajouter un log dédié expliquant en détail le calcul du score.
+US2 - Mettre en évidence les changements importants dans les données en fonction de la période.
+US3 - Gérer l’orientation selon la période de la journée (matin, midi, soir).
+US4 - Accélérer le stream pour simuler les différentes heures de la journée.
+US5 - Intégrer le calcul de concentration en CO2 existant.
 
 
 REDJECHTA Abderraouf -
@@ -29,13 +25,11 @@ US5 - Rechercher une salle
 US6 - Filtrer les salles
 
 HBADA Ilyes - 
-US1-Associer utilité capteurs(temperature, humidité présence et donc calculer le score via ça)
-US2-Créer vue capteurs(voir tout les capeur par salle)
-US3-Définir indicateurs monitoring	
-US4-Agréger données par salle du monitoring 	
-US5-Afficher état global des salles	dan le monitoring 
-US6-Définir seuils activation des capteurs
-US7-Implémenter regle activiation des capteurs manuellement si seuil de temprature depassé
+US1 - Définir capteur défaillant	
+US2 - Détecter incohérences du capteur	
+US3 - Générer alerte panne	
+US4 - Action manuelle ON du à un probleme constater capteur temperature
+US5 - Historique des valeurs du capteur	
 
 KHEDIM Mohammed - 
 US1 - Rechercher la salle optimale pour un Job Dating selon un algorithme se basant sur des critères de concentration CO2, et de données mockées par mes camarades

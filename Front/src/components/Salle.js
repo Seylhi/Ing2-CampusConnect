@@ -13,6 +13,13 @@ export default function Salle() {
   // Constantes pour la fenetre de log au lieu de faire des alertes
   const [logWindow, setLogWindow] = useState(null);
 
+  // Constantes pour notre simulation
+  const [simDate] = useState(new Date().toISOString().slice(0, 10));
+  const [simSequence, setSimSequence] = useState("jour");
+  const [simResults, setSimResults] = useState([]);
+  const [simColonnes, setSimColonnes] = useState([]);
+  const [simScoreType, setSimScoreType] = useState("energie");
+
 
   // Charger les salles
   const loadSalles = async () => {
@@ -114,6 +121,184 @@ export default function Salle() {
       .catch((err) => {
         alert("Erreur lors du calcul d'attribution : " + err);
       });
+  };
+
+  // Juste pour appeler directement nos coleurs par la suite dans nos exemples
+  const getColor = (score) => {
+    if (score >= 70) return "green";
+    if (score >= 50) return "orange";
+    return "red";
+  };
+
+  // Ajout de la méthode de la simulation
+  const lancerSimulation = async () => {
+    setSimResults([]);
+    const jours = [];
+    const nbJours =
+      simSequence === "jour" ? 1 :
+        simSequence === "semaine" ? 7 :
+          14;
+
+    for (let i = 0; i < nbJours; i++) {
+      const dt = new Date(simDate + "T12:00"); // cela permet de compenser le décallage horaire, en effet, j'étais toujours en retard
+      // de 1j
+      dt.setDate(dt.getDate() + i);
+      jours.push({
+        // initialisation de la date, on recupere les 10 premiers elements de l'iso puis on choisit le format d'affichage
+        label: dt.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" }),
+        date: dt.toISOString().slice(0, 10)
+      });
+    }
+    setSimColonnes(jours);
+
+    // initialisation des différentes sequences de la journée, on les affilie a des heures
+    const periodes = [
+      { key: "MATIN", label: "Matin", heure: "T08:00" },
+      { key: "APRES_MIDI", label: "Après-M.", heure: "T14:00" },
+      { key: "SOIR", label: "Soir", heure: "T20:00" },
+    ];
+
+    const promises = salles.map(async (salle) => {
+      const scoresParPeriode = await Promise.all(
+        periodes.map(async (periode) => {
+          const scoresParJour = await Promise.all(
+            jours.map(({ date }) =>
+              axios.get(`${LOCAL_HOST_SALLE}${salle.idSalle}/score/simulation?dateTime=${date + periode.heure}`)
+                .then(r => r.data)
+                .catch(() => null)
+            )
+          );
+          return { ...periode, scoresParJour };
+        })
+      );
+      return { salle, scoresParPeriode };
+    });
+
+    
+    const res = await Promise.all(promises);
+    setSimResults(res);
+  };
+
+  const ouvrirDetailsTempHum = () => {
+    const win = window.open("", "_blank", "width=1100,height=700");
+
+    const nbJours =
+      simSequence === "jour" ? 1 :
+        simSequence === "semaine" ? 7 :
+          14;
+
+    const jours = [];
+    for (let i = 0; i < nbJours; i++) {
+      const dt = new Date(simDate + "T12:00");
+      dt.setDate(dt.getDate() + i);
+      jours.push({
+        label: dt.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" }), // il s'agit simplement des paramètres 
+        // pour nos en-têtes de colonnes
+        date: dt.toISOString().slice(0, 10) // cette méthode permet de récupérer une date sous un certain format, dans notre cas ISO, d'en garder 
+        // seulement les 10 premiers caractères car c'est la forme que l'on souhiate
+      });
+    }
+
+    // on utilisera uniquement ces trois sequences
+    const periodesAffichees = ["MATIN", "APRES_MIDI", "SOIR"];
+
+    let html = `
+    <html>
+    <head>
+    <title>Températures & Humidités</title>
+    <style>    
+      h2 { text-align: center; }
+      p { text-align: center; }
+      table { border-collapse: collapse; width: 100%; font-size: 13px; }
+      th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: center; }
+      thead { background: #2c3e50; color: white; }
+      .matin { background: #fff9e6; }
+      .apres { background: #e6f0ff; }
+      .soir  { background: #f0ffe6; }
+      .salle { font-weight: bold; background: #f5f5f5; }
+      .separateur td { background: #ddd; height: 4px; }
+    </style>
+    </head>
+    <body>
+    <h2>Températures & Humidités par salle</h2>
+    <p>Séquence : <strong>${simSequence}</strong> — Du ${new Date(simDate + "T00:00").toLocaleDateString("fr-FR")} ${nbJours > 1 ? `sur ${nbJours} jour(s)` : ""}</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Salle</th>
+          <th>Période</th>
+          ${jours.map(function (jour) {
+      return `<th>${jour.label}</th>`;
+    }).join("")}
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+    const fetchAll = async () => {
+      for (const salle of salles) {
+        for (const periode of periodesAffichees) {
+
+          let heure;
+          if (periode === "MATIN") {
+            heure = "T08:00";       // heure du matin où l'on va relever les infos
+          } else if (periode === "APRES_MIDI") {
+            heure = "T14:00";       // heure de l'après-midi où l'on va relever les infos
+          } else {
+            heure = "T20:00";       // heure du soir où l'on va relever les infos
+          }
+
+          let classPeriode;
+          if (periode === "MATIN") {  // on mets juste en forme nos colonnes et autre
+            classPeriode = "matin";
+          } else if (periode === "APRES_MIDI") {
+            classPeriode = "apres-midi";
+          } else {
+            classPeriode = "soir";
+          }
+
+          let labelPeriode;
+          if (periode === "MATIN") {
+            labelPeriode = "Matin";
+          } else if (periode === "APRES_MIDI") {
+            labelPeriode = "Après-midi";
+          } else {
+            labelPeriode = "Soir";
+          }
+
+          // ici on va tester toutes les cellules en même temps puis on attend qu'elles soient toutes finies
+          const cellules = await Promise.all(
+            jours.map(async ({ date }) => {
+              const dateTime = date + heure;
+              try {
+                const res = await axios.get(`${LOCAL_HOST_SALLE}${salle.idSalle}/score/simulation?dateTime=${dateTime}`);
+                const temp = res.data.temperature != null ? `${res.data.temperature.toFixed(1)}°C` : "N/A";
+                const hum = res.data.humidite != null ? `${res.data.humidite.toFixed(1)}%` : "N/A";
+                return `<td class="${classPeriode}">${temp}<br/><small>${hum}</small></td>`;
+              } catch {
+                return `<td>N/A</td>`;
+              }
+            })
+          );
+
+          html += `
+          <tr>
+            <td class="salle">${periode !== "MATIN" ? "" : salle.nomSalle}</td>
+            <td class="${classPeriode}">${labelPeriode}</td>
+            ${cellules.join("")}
+          </tr>
+        `;
+        }
+        // mise en place d'un séparateur pour rendre plus lisible notre tableau
+        html += `<tr class="separateur"><td colspan="${jours.length + 2}"></td></tr>`;
+      }
+
+      html += `</tbody></table></body></html>`;
+      win.document.write(html);
+      win.document.close();
+    };
+
+    fetchAll();
   };
 
   // Tableau avec les salles et leurs scores
@@ -290,6 +475,111 @@ export default function Salle() {
             </table>
           </div>
         )}
+
+        <div className="mt-5 mb-5">
+          <h5>Simulation temporelle</h5>
+
+          <div className="mb-3 d-flex justify-content-center align-items-center gap-3">
+            <div>
+              <label className="me-2">Date du jour :</label>
+              <input
+                type="date"
+                value={new Date().toISOString().slice(0, 10)}
+                readOnly
+                style={{ background: "#f5f5f5", cursor: "not-allowed" }}
+              />
+            </div>
+            <div>
+              <label className="me-2">Séquence :</label>
+              <select
+                value={simSequence}
+                onChange={e => setSimSequence(e.target.value)}
+              >
+                <option value="jour">Par jour (1 jour – matin/après-midi/soir)</option>
+                <option value="semaine">Par semaine (7 jours – matin/après-midi/soir)</option>
+                <option value="2semaines">Par 2 semaines (14 jours – matin/après-midi/soir)</option>
+              </select>
+            </div>
+            <button className="btn btn-primary" onClick={lancerSimulation}>
+              Lancer la simulation
+            </button>
+          </div>
+
+          {simResults.length > 0 && (
+            <>
+              <div className="mb-2">
+                <label className="me-2">Afficher :</label>
+                <select value={simScoreType} onChange={e => setSimScoreType(e.target.value)}>
+                  <option value="energie">Score Énergie</option>
+                  <option value="confort">Score Confort</option>
+                  <option value="co2">Score CO²</option>
+                </select>
+              </div>
+
+              <div style={{ overflowX: "auto" }}>
+                <table className="table table-sm table-bordered">
+                  <thead className="table-dark">
+                    <tr>
+                      <th>Salle</th>
+                      <th>Période</th>
+                      {simColonnes.map((j, i) => <th key={i}>{j.label}</th>)}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {simResults.map(({ salle, scoresParPeriode }) => (
+                      <React.Fragment key={salle.idSalle}>
+                        {scoresParPeriode.map((periode, daytab) => {
+                          const bgColor =
+                            periode.key === "MATIN" ? "#fff9e6" :
+                              periode.key === "APRES_MIDI" ? "#e6f0ff" :
+                                "#f0ffe6";
+                          return (
+                            <tr key={daytab}>
+                              <td style={{ fontWeight: "bold", background: "#f5f5f5" }}>
+                                {daytab === 0 ? salle.nomSalle : ""}
+                              </td>
+                              <td style={{ background: bgColor }}>{periode.label}</td>
+                              {periode.scoresParJour.map((data, ji) => {
+                                if (!data) return <td key={ji} style={{ color: "gray" }}>N/A</td>;
+                                const score =
+                                  simScoreType === "confort" ? data.scoreConfort :
+                                    simScoreType === "co2" ? data.scoreCO2 :
+                                      data.scoreEnergie;
+                                const s = score ?? 0;
+                                return (
+                                  <td key={ji} style={{ background: bgColor, color: getColor(s), fontWeight: "bold" }}>
+                                    {s.toFixed(0)}
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          );
+                        })}
+                        {/* On ajoute un colonne horizontale afin de séparer nos colonnes sinon ça perd en lisibilité */}
+                        <tr>
+                          <td colSpan={2 + simColonnes.length} style={{ background: "#ddd", height: "4px", padding: 0 }} />
+                        </tr>
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="mt-2 d-flex justify-content-center gap-4">
+                <span style={{ color: "green" }}>Bon (≥ 70)</span>
+                <span style={{ color: "orange" }}>Moyen (50-69)</span>
+                <span style={{ color: "red" }}>Faible (&lt; 50)</span>
+              </div>
+
+              <div className="mt-3">
+                <button className="btn btn-outline-dark" onClick={ouvrirDetailsTempHum}>
+                  Voir températures & humidités détaillées
+                </button>
+              </div>
+            </>
+          )}
+
+        </div>
         <button
           className="btn btn-secondary mt-4 mb-4"
           // on a rajouté une marge en bas pour rendre le bouton 

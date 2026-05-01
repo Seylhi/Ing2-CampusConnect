@@ -182,15 +182,7 @@ public class JobDatingRoomService {
                     niveauSonoreDb = 60.0 + 10.0 * Math.log10(nbPersonnesPresentes);
                 }
 
-                // calcul du score de bruit sur 10 pts
-                int scoreBruit = 0;
-                if (niveauSonoreDb < 65) {
-                    scoreBruit = 10; 
-                } else if (niveauSonoreDb < 75) {
-                    scoreBruit = 4; 
-                } else {
-                    scoreBruit = 0; 
-                }
+                int scoreBruit = calculerScoreBruit(niveauSonoreDb);
 
 
                 // calcul du score total sur 100 pts
@@ -199,7 +191,6 @@ public class JobDatingRoomService {
                 if (salleActuelle.getCapacite() < nbPersonnesPresentes) {
                 scoreTotal = 0;
             }
-
 
         String status = "";
             if (nbPersonnesPresentes == 0) {
@@ -232,6 +223,16 @@ public class JobDatingRoomService {
 
         return listeResultats;
     }
+    
+    public int calculerScoreBruit(double niveauSonoreDb) {
+    if (niveauSonoreDb < 65) {
+        return 10;
+    } else if (niveauSonoreDb < 75) {
+        return 4;
+    } else {
+        return 0;
+    }
+}
 
     // Duplication de la logique de calcul pour l'adapter aux salles afin de
     // compléter mon calcul de score global
