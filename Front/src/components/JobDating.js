@@ -29,11 +29,11 @@ export default function JobDating() {
       `Constantes : Cext = 400 ppm, G = 0.018 m3/h, V = Surface x 3m\n` +
       `Ventilation (ACH) : Comprise entre 2.0 et 4.0\n\n` +
       `--- Criteres et Scores ---\n` +
-      `Affluence (${heure}h) : Prevus=${nbPersonnes} | Facteur=${facteurAffluence} | Presents=${res.nbPersonnesPresentes}\n` +
-      `Densite : Capacite=${res.salle.capacite} | Remplissage=${(res.tauxRemplissage * 100).toFixed(1)}% -> ${res.scoreDensite} / 15 pts\n` +
-      `Temperature : ${res.salle.temperature != null ? res.salle.temperature : "20 (defaut)"} C -> ${res.scoreTemperature} / 15 pts\n` +
-      `Humidite : ${res.salle.humidite != null ? res.salle.humidite : "50 (defaut)"} % -> ${res.scoreHumidite} / 10 pts\n` +
-      `Qualite Air (CO2) : ACH=${res.achUtilise.toFixed(2)} | CO2 estime=${res.co2Estime.toFixed(2)} ppm -> ${res.scoreCo2} / 50 pts\n` +
+      `Affluence (${heure}h) : Prévus=${nbPersonnes} | Facteur=${facteurAffluence} | Présents=${res.nbPersonnesPresentes}\n` +
+      `Densité : Capacite=${res.salle.capacite} | Remplissage=${(res.tauxRemplissage * 100).toFixed(1)}% -> ${res.scoreDensite} / 15 pts\n` +
+      `Température : ${res.salle.temperature != null ? res.salle.temperature : "20"} °C -> ${res.scoreTemperature} / 15 pts\n` +
+      `Humidité : ${res.salle.humidite != null ? res.salle.humidite : "50"} % -> ${res.scoreHumidite} / 10 pts\n` +
+      `Qualité Air (CO2) : ACH=${res.achUtilise.toFixed(2)} | CO2 estime=${res.co2Estime.toFixed(2)} ppm -> ${res.scoreCo2} / 50 pts\n` +
       `Bruit: ${res.niveauSonoreDb.toFixed(2)} dB -> ${res.scoreBruit} / 10 pts\n\n` +
       `=== SCORE FINAL : ${res.score} / 100 (${res.status}) ===`
     );
@@ -122,11 +122,11 @@ export default function JobDating() {
         <thead>
           <tr>
             <th style={{ border: "1px solid black", padding: "5px" }}>Salle</th>
-            <th style={{ border: "1px solid black", padding: "5px" }}>Capacite</th>
-            <th style={{ border: "1px solid black", padding: "5px" }}>Presents</th>
-            <th style={{ border: "1px solid black", padding: "5px" }}>Densite</th>
-            <th style={{ border: "1px solid black", padding: "5px" }}>Temperature</th>
-            <th style={{ border: "1px solid black", padding: "5px" }}>Humidite</th>
+            <th style={{ border: "1px solid black", padding: "5px" }}>Capacité</th>
+            <th style={{ border: "1px solid black", padding: "5px" }}>Présents</th>
+            <th style={{ border: "1px solid black", padding: "5px" }}>Densité</th>
+            <th style={{ border: "1px solid black", padding: "5px" }}>Température</th>
+            <th style={{ border: "1px solid black", padding: "5px" }}>Humidité</th>
             <th style={{ border: "1px solid black", padding: "5px" }}>Bruit</th>
             <th style={{ border: "1px solid black", padding: "5px" }}>CO2</th>
             <th style={{ border: "1px solid black", padding: "5px" }}>Score</th>
