@@ -25,13 +25,11 @@ US5 - Rechercher une salle
 US6 - Filtrer les salles
 
 HBADA Ilyes - 
-US1-Associer utilité capteurs(temperature, humidité présence et donc calculer le score via ça)
-US2-Créer vue capteurs(voir tout les capeur par salle)
-US3-Définir indicateurs monitoring	
-US4-Agréger données par salle du monitoring 	
-US5-Afficher état global des salles	dan le monitoring 
-US6-Définir seuils activation des capteurs
-US7-Implémenter regle activiation des capteurs manuellement si seuil de temprature depassé
+US1 - Définir capteur défaillant	
+US2 - Détecter incohérences du capteur	
+US3 - Générer alerte panne	
+US4 - Action manuelle ON du à un probleme constater capteur temperature
+US5 - Historique des valeurs du capteur	
 
 KHEDIM Mohammed - 
 US1 - Rechercher la salle optimale pour un Job Dating selon un algorithme se basant sur des critères de concentration CO2, et de données mockées par mes camarades
