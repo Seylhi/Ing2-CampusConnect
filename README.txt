@@ -32,9 +32,11 @@ US4 - Action manuelle ON du à un probleme constater capteur temperature
 US5 - Historique des valeurs du capteur	
 
 KHEDIM Mohammed - 
-US1 - Rechercher la salle optimale pour un Job Dating selon un algorithme se basant sur des critères de concentration CO2, et de données mockées par mes camarades
-US2 – Voir les caractéristiques physique de la salle selectionnée par l'algorithme
-US3 – Voir le détail du calcul
+US1 - Générer un classement comparatif de toutes les salles en intégrant une dimension temporelle et l'affluence prévue.
+US2 - Intégrer de nouveaux paramètres physiques à l'algorithme de scoring des salles de JobDating.
+US3 - Implémenter des contraintes dynamiques en faisant varier les éléments clés au calcul de CO2 et score global. 
+US4 - Créer une simulation temporelle d'une journée pour anticiper la variabilité des différentes données et score.
+US5 - Afficher un log détaillé exposant les données directement sur l'heure établit et la salle, associées aux formules pour justifier le score.
 
 Application multifonctionnelle - Campus universitaire. (Gestion des salles, capteurs, offres de stages et emplois, cartes graphiques)
 -
