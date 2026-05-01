@@ -11,4 +11,6 @@ import java.util.Optional;
 @Repository
 public interface SalleMockJournalierRepository extends JpaRepository<SalleMockJournalier, Long> {
     Optional<SalleMockJournalier> findFirstByIdSalleAndDateJourOrderByIdDesc(Long idSalle, LocalDate dateJour);
+
+    SalleMockJournalier findByIdSalleAndDateJourAndPeriode(Long idSalle, LocalDate dateJour, String periode);
 }
