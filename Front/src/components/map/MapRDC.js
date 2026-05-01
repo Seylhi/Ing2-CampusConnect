@@ -42,7 +42,7 @@ const selectedStyle = {
   weight: 5,
 };
 
-function MapRDC() {
+function MapRDC({ canSeeCapteurInfos }) {
   const mapRef = useRef(null);
 
   /* ===== STATES ===== */
@@ -203,7 +203,7 @@ function MapRDC() {
 
   return (
     <>
-      <MapStats />
+      <MapStats canSeeCapteurInfos={canSeeCapteurInfos} />
       <div style={{ height: "100%", width: "100%", position: "relative" }}>
         {/* ===== BARRE RECHERCHE + FILTRES ===== */}
         <div style={{ padding: 10, background: "#f5f5f5" }}>
@@ -390,90 +390,92 @@ function MapRDC() {
                 <p>
                   <b>TP :</b> {salleSelectionnee.estSalleTp ? "Oui" : "Non"}
                 </p>
-                <p>
-                  <b>Chauffage :</b>{" "}
-                  {salleSelectionnee.chauffage ? "Oui" : "Non"}
-                </p>
+                {canSeeCapteurInfos && (
+                  <>
+                    <p>
+                      <b>Chauffage :</b>{" "}
+                      {salleSelectionnee.chauffage ? "Oui" : "Non"}
+                    </p>
 
-                <hr />
+                    <hr />
 
-                <div style={{ marginBottom: 15 }}>
-                  <b>Confort :</b> {confort.toFixed(1)} / 100
-                  <div
-                    style={{
-                      background: "#eee",
-                      borderRadius: 10,
-                      height: 10,
-                      marginTop: 6,
-                    }}
-                  >
-                    <div
+                    <div style={{ marginBottom: 15 }}>
+                      <b>Confort :</b> {confort.toFixed(1)} / 100
+                      <div
+                        style={{
+                          background: "#eee",
+                          borderRadius: 10,
+                          height: 10,
+                          marginTop: 6,
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: `${confort}%`,
+                            background: statutConfort.color,
+                            height: "100%",
+                            borderRadius: 10,
+                            transition: "0.4s ease",
+                          }}
+                        />
+                      </div>
+                      <div
+                        style={{
+                          color: statutConfort.color,
+                          fontWeight: "bold",
+                          marginTop: 4,
+                        }}
+                      >
+                        {statutConfort.label}
+                      </div>
+                    </div>
+
+                    <div>
+                      <b>Énergie :</b> {energie.toFixed(1)} / 100
+                      <div
+                        style={{
+                          background: "#eee",
+                          borderRadius: 10,
+                          height: 10,
+                          marginTop: 6,
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: `${energie}%`,
+                            background: statutEnergie.color,
+                            height: "100%",
+                            borderRadius: 10,
+                            transition: "0.4s ease",
+                          }}
+                        />
+                      </div>
+                      <div
+                        style={{
+                          color: statutEnergie.color,
+                          fontWeight: "bold",
+                          marginTop: 4,
+                        }}
+                      >
+                        {statutEnergie.label}
+                      </div>
+                    </div>
+                    <button
                       style={{
-                        width: `${confort}%`,
-                        background: statutConfort.color,
-                        height: "100%",
-                        borderRadius: 10,
-                        transition: "0.4s ease",
+                        marginTop: 15,
+                        padding: "6px 10px",
+                        background: "#2c3e50",
+                        color: "white",
+                        border: "none",
+                        borderRadius: 6,
+                        cursor: "pointer",
                       }}
-                    />
-                  </div>
-                  <div
-                    style={{
-                      color: statutConfort.color,
-                      fontWeight: "bold",
-                      marginTop: 4,
-                    }}
-                  >
-                    {statutConfort.label}
-                  </div>
-                </div>
+                      onClick={() => {
+                        const dE = salleSelectionnee.detailsEnergie || {};
+                        const dC = salleSelectionnee.detailsConfort || {};
 
-                <div>
-                  <b>Énergie :</b> {energie.toFixed(1)} / 100
-                  <div
-                    style={{
-                      background: "#eee",
-                      borderRadius: 10,
-                      height: 10,
-                      marginTop: 6,
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: `${energie}%`,
-                        background: statutEnergie.color,
-                        height: "100%",
-                        borderRadius: 10,
-                        transition: "0.4s ease",
-                      }}
-                    />
-                  </div>
-                  <div
-                    style={{
-                      color: statutEnergie.color,
-                      fontWeight: "bold",
-                      marginTop: 4,
-                    }}
-                  >
-                    {statutEnergie.label}
-                  </div>
-                </div>
-                <button
-                  style={{
-                    marginTop: 15,
-                    padding: "6px 10px",
-                    background: "#2c3e50",
-                    color: "white",
-                    border: "none",
-                    borderRadius: 6,
-                    cursor: "pointer",
-                  }}
-                  onClick={() => {
-                    const dE = salleSelectionnee.detailsEnergie || {};
-                    const dC = salleSelectionnee.detailsConfort || {};
-
-                    alert(
-                      `=== DÉTAIL CALCUL SCORE ===
+                        alert(
+                          `=== DÉTAIL CALCUL SCORE ===
 
 --- CONFORT ---
 Température: ${salleSelectionnee.temperature}°C
@@ -498,11 +500,13 @@ Coef Vacances: ${salleSelectionnee.coefVacances}
 
 Score Énergie Final: ${salleSelectionnee.scoreEnergie.toFixed(2)}
 `,
-                    );
-                  }}
-                >
-                  Voir détail calcul
-                </button>
+                        );
+                      }}
+                    >
+                      Voir détail calcul
+                    </button>
+                  </>
+                )}
               </div>
             );
           })()}

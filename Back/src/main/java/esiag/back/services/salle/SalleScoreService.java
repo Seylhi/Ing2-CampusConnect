@@ -12,7 +12,7 @@ import esiag.back.repositories.capteur.CapteurRepository;
 import esiag.back.repositories.salle.SalleMockJournalierRepository;
 import esiag.back.models.salle.Salle;
 import esiag.back.models.salle.SalleMockJournalier;
-
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -58,8 +58,9 @@ public class SalleScoreService {
         Capteur capteurHum = capteurRepository
                 .findTopByIdSalleAndTypeOrderByDateMesureDesc(idSalle, "HUMIDITE");
 
-        SalleMockJournalier mockJournalier = mockRepository
-                .findByIdSalleAndDateJour(salle.getIdSalle(), localDate);
+        Optional<SalleMockJournalier> mockJournalierOpt = mockRepository
+                .findFirstByIdSalleAndDateJourOrderByIdDesc(salle.getIdSalle(), localDate);
+        SalleMockJournalier mockJournalier = mockJournalierOpt.orElse(null);
 
         // C'est ici que l'on déclare nos variables provenant de capteurs afin de
         // garder la même forme mais avec des données liées à celle de Capteur
@@ -188,13 +189,15 @@ public class SalleScoreService {
 
         // Calcul du Co2 d'après JobDating
         int nbPersonnes = salle.getCapacite();
-        int scoreCo2 = jobDatingRoomService.getScoreCO2(salle, nbPersonnes, 12); //heure moyenne de la journée pour le jobdating
-        scoreCo2 = scoreCo2 * 2; // sert à adapter le score CO2 de Mohamed qui est initialement sur 60 à 100 -- je pars sur un score CO2 de 50
+        int scoreCo2 = jobDatingRoomService.getScoreCO2(salle, nbPersonnes, 12); // heure moyenne de la journée pour le
+                                                                                 // jobdating
+        scoreCo2 = scoreCo2 * 2; // sert à adapter le score CO2 de Mohamed qui est initialement sur 60 à 100 --
+                                 // je pars sur un score CO2 de 50
 
         log("");
         log("DONNEES & CALCULS LIEES AU CO2");
         log("Nombre de personnes : " + nbPersonnes);
-        log("Score CO2 (avant adaptation) : " + jobDatingRoomService.getScoreCO2(salle, nbPersonnes, 12)); 
+        log("Score CO2 (avant adaptation) : " + jobDatingRoomService.getScoreCO2(salle, nbPersonnes, 12));
         log("Score CO2 final : " + scoreCo2);
 
         // SCORE CONFORT
