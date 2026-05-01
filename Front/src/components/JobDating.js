@@ -29,7 +29,7 @@ export default function JobDating() {
       `Constantes : Cext = 400 ppm, G = 0.018 m3/h, V = Surface x 3m\n` +
       `Ventilation (ACH) : Comprise entre 2.0 et 4.0\n\n` +
       `--- Criteres et Scores ---\n` +
-      `Affluence (${heure}h) : Prévus=${nbPersonnes} | Facteur=${facteurAffluence} | Présents=${res.nbPersonnesPresentes}\n` +
+      `Affluence (${heure}h) : Prévus=${nbPersonnes} | Facteur=${facteurAffluence} | Présence=${res.nbPersonnesPresentes}\n` +
       `Densité : Capacite=${res.salle.capacite} | Remplissage=${(res.tauxRemplissage * 100).toFixed(1)}% -> ${res.scoreDensite} / 15 pts\n` +
       `Température : ${res.salle.temperature != null ? res.salle.temperature : "20"} °C -> ${res.scoreTemperature} / 15 pts\n` +
       `Humidité : ${res.salle.humidite != null ? res.salle.humidite : "50"} % -> ${res.scoreHumidite} / 10 pts\n` +
@@ -123,7 +123,7 @@ export default function JobDating() {
           <tr>
             <th style={{ border: "1px solid black", padding: "5px" }}>Salle</th>
             <th style={{ border: "1px solid black", padding: "5px" }}>Capacité</th>
-            <th style={{ border: "1px solid black", padding: "5px" }}>Présents</th>
+            <th style={{ border: "1px solid black", padding: "5px" }}>Présence</th>
             <th style={{ border: "1px solid black", padding: "5px" }}>Densité</th>
             <th style={{ border: "1px solid black", padding: "5px" }}>Température</th>
             <th style={{ border: "1px solid black", padding: "5px" }}>Humidité</th>
@@ -144,10 +144,10 @@ export default function JobDating() {
                 <td style={{ border: "1px solid black", padding: "5px" }}>{(res.tauxRemplissage * 100).toFixed(1)} %</td>
                 
                 <td style={{ border: "1px solid black", padding: "5px" }}>
-                  {res.salle.temperature != null ? res.salle.temperature : "20 (defaut)"} C
+                  {res.salle.temperature != null ? res.salle.temperature : "20"} °C
                 </td>
                 <td style={{ border: "1px solid black", padding: "5px" }}>
-                  {res.salle.humidite != null ? res.salle.humidite : "50 (defaut)"} %
+                  {res.salle.humidite != null ? res.salle.humidite : "50"} %
                 </td>
                 
                 <td style={{ border: "1px solid black", padding: "5px" }}>{res.niveauSonoreDb.toFixed(1)} dB</td>
