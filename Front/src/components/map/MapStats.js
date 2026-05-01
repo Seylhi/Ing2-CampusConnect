@@ -4,7 +4,7 @@ import {
   INCREMENT_MAP_CONSULTATION,
 } from "../../constants/back";
 
-function MapStats() {
+function MapStats({ canSeeCapteurInfos }) {
   const [stats, setStats] = useState(null);
   const hasIncremented = useRef(false);
 
@@ -46,11 +46,18 @@ function MapStats() {
       }}
     >
       <h3>Statistiques globales</h3>
+
       <p>Total salles : {stats.totalSalles}</p>
       <p>Salles occupées : {stats.sallesOccupees}</p>
       <p>Taux occupation : {stats.tauxOccupation?.toFixed(1)} %</p>
-      <p>Température moyenne : {stats.temperatureMoyenne?.toFixed(1)} °C</p>
-      <p>Humidité moyenne : {stats.humiditeMoyenne?.toFixed(1)} %</p>
+
+      {canSeeCapteurInfos && (
+        <>
+          <p>Température moyenne : {stats.temperatureMoyenne?.toFixed(1)} °C</p>
+          <p>Humidité moyenne : {stats.humiditeMoyenne?.toFixed(1)} %</p>
+        </>
+      )}
+
       <p>Consultations map : {stats.consultationsMap}</p>
     </div>
   );

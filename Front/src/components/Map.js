@@ -1,9 +1,12 @@
 import { useState } from "react";
 import MapRDC from "./map/MapRDC";
 import MapEtage1 from "./map/MapEtage1";
+import { ROLES, hasRole } from "../utils/auth";
 
 function Map() {
   const [etage, setEtage] = useState("RDC");
+
+  const canSeeCapteurInfos = hasRole([ROLES.ADMIN, ROLES.AGENT_SECURITE]);
 
   const changerEtage = () => {
     setEtage(etage === "RDC" ? "ETAGE1" : "RDC");
@@ -11,7 +14,6 @@ function Map() {
 
   return (
     <div style={{ position: "relative", height: "100vh" }}>
-      {/* Bouton changer d'étage */}
       <button
         onClick={changerEtage}
         style={{
@@ -26,9 +28,13 @@ function Map() {
         {etage === "RDC" ? "1er étage" : "RDC"}
       </button>
 
-      {/* Affichage de l'étage */}
-      {etage === "RDC" && <MapRDC />}
-      {etage === "ETAGE1" && <MapEtage1 />}
+      {etage === "RDC" && (
+        <MapRDC canSeeCapteurInfos={canSeeCapteurInfos} /> // ici j'ai mi ca pour contrôler l'affichage des infos des capteurs en fonction du role de l'utilisateur
+      )}
+
+      {etage === "ETAGE1" && (
+        <MapEtage1 canSeeCapteurInfos={canSeeCapteurInfos} /> // la meme chose ici pour le 1er étage
+      )}
     </div>
   );
 }

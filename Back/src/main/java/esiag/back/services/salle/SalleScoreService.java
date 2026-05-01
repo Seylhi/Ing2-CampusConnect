@@ -10,7 +10,7 @@ import esiag.back.services.jobdating.JobDatingRoomService;
 import esiag.back.repositories.salle.SalleMockJournalierRepository;
 import esiag.back.models.salle.Salle;
 import esiag.back.models.salle.SalleMockJournalier;
-
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -53,8 +53,9 @@ public class SalleScoreService {
         log("Surface salle : " + salle.getSurfaceM2());
         log("Nb fenêtres : " + salle.getNbFenetres());
 
-        SalleMockJournalier mockJournalier = mockRepository
-                .findByIdSalleAndDateJourAndPeriode(salle.getIdSalle(), localDate, periode);
+        Optional<SalleMockJournalier> mockJournalierOpt = mockRepository
+                .findFirstByIdSalleAndDateJourOrderByIdDesc(salle.getIdSalle(), localDate);
+        SalleMockJournalier mockJournalier = mockJournalierOpt.orElse(null);
 
         if (mockJournalier != null) {
             salle.setTemperature(mockJournalier.getTemperature());
@@ -208,7 +209,7 @@ public class SalleScoreService {
         log("");
         log("DONNEES & CALCULS LIEES AU CO2");
         log("Nombre de personnes : " + nbPersonnes);
-        log("Score CO2 (avant adaptation) : " + jobDatingRoomService.getScoreCO2(salle, nbPersonnes, 12)); 
+        log("Score CO2 (avant adaptation) : " + jobDatingRoomService.getScoreCO2(salle, nbPersonnes, 12));
         log("Score CO2 final : " + scoreCo2);
 
         // SCORE CONFORT
